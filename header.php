@@ -92,11 +92,17 @@ if (!isset ($_GET ['quiet'])) {
 
 <!-- for bootstrap 5 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
 <link rel="shortcut icon" type="image/jpg" href="anneli/assets/img/favicon.png"/>
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<!-- <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-red.min.css" /> -->
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
 <!-- <link type="text/css" rel="stylesheet" href="assets/css/bootstrap.css"> -->
 <?php if (! isset ($_GET ['print'])) {?>
+<link type="text/css" rel="stylesheet" href="<?php echo "/anneli/themer_mdl.php?font=$font&theme=$theme&skin=$skin" ;?>">
 <link type="text/css" rel="stylesheet" href="<?php echo "/anneli/themer2.php?font=$font&theme=$theme&skin=$skin" ;?>">
 <?php }?>
 <!-- <link type="text/css" rel="stylesheet" href="/assets/css/themes/green.css"> -->
@@ -122,7 +128,7 @@ if (!isset ($_GET ['quiet'])) {
   </title>
   <meta name="description" content="<?php echo $description ;?>">
   <meta name="keywords" content="<?php echo $codename ; echo $description ;?>">
-  <meta name="author" content="Shaji Khan | GDC Udhampur">
+  <meta name="author" content="Shaji Khan">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
@@ -130,6 +136,8 @@ if (!isset ($_GET ['quiet'])) {
 </head>
 <body class="index-page sidebar-collapse">
   <!-- Navbar -->
+  <div class="mdl-layout mdl-js-layout">
+  
   <div class="navbar navbar-expand-lg navbar-dark bg-<?php echo $config ['header-bg'] .' ' ; if ($config ['header'] == false) echo 'd-none' ;?>">
     <div class="container">
       <a href="../" class="navbar-brand">
@@ -156,8 +164,9 @@ if (!isset ($_GET ['quiet'])) {
             <button class="btn btn-sm ml-2 nav-link btn-primary d-none" data-toggle="modal" data-target="#login" id="menu-login">
               <i class="fa fa-shield-alt"></i> Login
             </button>
+            
             <li class="nav-item d-none dropdown" id="menu-account">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="mr-1 fas fa-user-circle"></i>
                 <span id="email"></span>
               </a>
@@ -172,10 +181,10 @@ if (!isset ($_GET ['quiet'])) {
                   <!-- <a class="dropdown-item" href="student.php"><i class="fas fa-edit"></i>&nbsp;&nbsp;Give Exam</a> -->
                 <?php } ?>
                 <!-- <a class="dropdown-item" href="words.php">My Words</a> -->
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-item" data-toggle="modal" data-target="#colors">
+                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#colors">
                   <i class="fas fa-cog"></i>&nbsp;Settings
                 </button>
+                <!-- <div class="dropdown-divider"></div> -->
                 <a class="dropdown-item" href="javascript:logout ()">
                   <i class="fa fa-shield-alt"></i>&nbsp;Logout
                 </a>
@@ -196,6 +205,17 @@ if (!isset ($_GET ['quiet'])) {
     </div>
   </div>
   <!-- End Navbar -->
+
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Title</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+    </nav>
+  </div>
+
 <?php 
 } 
 if (! $quiet) {

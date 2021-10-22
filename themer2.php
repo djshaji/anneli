@@ -17,6 +17,20 @@ INFO-HOVER-1
 INFO-HOVER-2
 */
 
+function hex_to_rgb ($color) {
+    // return array_map(
+    //     function ($c) {
+    //       return hexdec(str_pad($c, 2, $c));
+    //     },
+    //     str_split(ltrim($colorName, '#'), strlen($colorName) > 4 ? 2 : 1)
+    //   );
+    $split = str_split(substr ($color, 1), 2);
+    $r = hexdec($split[0]);
+    $g = hexdec($split[1]);
+    $b = hexdec($split[2]);
+    return "$r, $g, $b";
+}
+
 // Nunito
 header('Content-Type: text/css');
 if (! isset ($_GET ['font']))
@@ -45,9 +59,21 @@ if ($colors != null && $colors != "default") {
     $PRIMARY = explode (";",explode ( "--bs-primary: ", $theme) [1])[0];
 
     foreach (['primary', 'info'] as $accent) {
+        $color = explode (";",explode ( "--bs-" . $accent .": ", $theme) [1])[0] ;
         $theme = str_replace (
-            explode (";",explode ( "--bs-" . $accent .": ", $theme) [1])[0],
+            $color,
             $c [$accent], 
+            $theme
+        ) ;
+
+        $color_rgb = hex_to_rgb ($color);
+        $color_rgb_new = str_replace (")", "", explode ("rgb(",$c [$accent])[1]);
+        
+        // echo $color_rgb_new, $color_rgb, $color, ' ', $c [$accent] ;
+        // die ();
+        $theme = str_replace (
+            $color_rgb,
+            $color_rgb_new,
             $theme
         ) ;
     }

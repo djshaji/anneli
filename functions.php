@@ -43,7 +43,7 @@ function colors_dialog () {
             </div> -->
             <div class="col-md-4">
               <b class="lead text-dark">Select Skin</b><br>
-              <select onchange="preview_theme ()" class="form-control" id="skin">
+              <select onchange="preview_theme ()" class="form-select" id="skin">
                 <option value="">Default</option>
                 <?php
                   $skins = scandir ("anneli/assets/css/themes") ;
@@ -57,13 +57,13 @@ function colors_dialog () {
             </div>
             <div class="col-md-4">
               <b class="lead text-dark">Select Theme</b><br>
-              <select onchange="preview_theme ()" class="form-control" id="color-schemes">
+              <select onchange="preview_theme ()" class="form-select" id="color-schemes">
                 <option value="">Default</option>
               </select>
             </div>
             <div class="col-md-4">
               <b class="lead text-dark">Select Font</b><br>
-              <select onchange="preview_theme ()" class="form-control" id="fonts">
+              <select onchange="preview_theme ()" class="form-select" id="fonts">
                 <option value="">Default</option>
               </select>
             </div>

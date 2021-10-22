@@ -16,6 +16,9 @@
 
 </div>
 
+<!-- mdl layout -->
+<?php if ($config ['header'] != false) echo '</div>' ;?>
+
 <!-- Modal -->
 <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">

@@ -1,0 +1,36 @@
+.bg-overlay {
+    background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7));
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    color: #fff;
+    height: 450px;
+    padding-top: 50px;
+}
+
+.dogra2 {
+    font-family: "Noto Serif Dogra"!important
+}
+
+.dogra {
+    font-family: "SarayuDogra"!important
+}
+
+.takri {
+    font-family: "Takri"!important
+}
+
+@font-face {
+  font-family: "SarayuDogra";
+  src: url(/assets/fonts/SarayuDogra.ttf);
+}
+
+@font-face {
+  font-family: "Takri";
+  src: url(/assets/fonts/NotoSansTakri-Regular.otf);
+}
+
+/* @font-face {
+  font-family: "Noto Serif Dogra";
+  src: url(https://cdn.jsdelivr.net/gh/googlei18n/noto-fonts/unhinted/otf/NotoSerifDogra/NotoSerifDogra-Regular.otf)
+} */

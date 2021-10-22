@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap");
+*
+{
+   font-family: Montserrat !important;
+}
+
+@font-face {
+  font-family: SarayuDogra;
+  src: url(/assets/fonts/SarayuDogra.ttf);
+}

@@ -2,6 +2,7 @@
 $root = [
   "2wdKBu0eqCXATgjS7ilpwEPYj3J3"
 ];
+
 ini_set('upload_max_filesize', '200M');
 date_default_timezone_set('Asia/Kolkata');
 include 'anneli/token.php';
@@ -207,12 +208,12 @@ if (!isset ($_GET ['quiet'])) {
   <!-- End Navbar -->
 
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout-title">Title</span>
+    <span class="mdl-layout-title">Menu</span>
     <nav class="mdl-navigation">
-      <a class="mdl-navigation__link" href="">Link</a>
-      <a class="mdl-navigation__link" href="">Link</a>
-      <a class="mdl-navigation__link" href="">Link</a>
-      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Messages</a>
+      <a class="mdl-navigation__link" href="">Media</a>
+      <a class="mdl-navigation__link" href="">Contacts</a>
+      <a class="mdl-navigation__link" href="">About</a>
     </nav>
   </div>
 

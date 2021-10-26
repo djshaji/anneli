@@ -42,3 +42,25 @@ function token_get_user ($uid) {
 
 }
 
+function token_login () {
+    global $uid ;
+    if ($_SESSION == null) {
+        $token = $_COOKIE ['token'];
+        $email = $_COOKIE ['email'];
+        if ($token != null) {
+          $uid = token_verify ($token, true);
+          if ($uid != null) {
+            session_start () ;
+            $_SESSION ['uid'] = $uid ;
+            if (!isset ($_GET ['quiet'])) {
+            ?>
+            <?php
+            }
+          }
+        } else {
+          session_unset () ;
+          if ($_SESSION)  
+            session_destroy () ;
+        }
+      }    
+}

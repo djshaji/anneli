@@ -4,8 +4,9 @@ require __DIR__.'/vendor/autoload.php';
 use Firebase\Auth\Token\Exception\InvalidToken;
 use Kreait\Firebase\Factory;
 
-
+$auth = null ;
 function token_verify ($idTokenString, $user = false) {
+    global $auth, $factory ;
     $factory = (new Factory)->withServiceAccount('../letsgodil-admin/lets-go-dil-firebase-adminsdk-8j1sk-900215dc14.json');
     $auth = $factory->createAuth();
     $verifiedIdToken = null; 
@@ -43,7 +44,7 @@ function token_get_user ($uid) {
 }
 
 function token_login () {
-    global $uid ;
+    global $uid, $email ;
     if ($_SESSION == null) {
         $token = $_COOKIE ['token'];
         $email = $_COOKIE ['email'];

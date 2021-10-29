@@ -76,13 +76,21 @@ if ($module == 'Index' || $module == '')
 if (!isset ($_GET ['quiet'])) {
 
 ?>
+
+<!-- To Do: Upgrade to Firebase 9 -->
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script> -->
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging-compat.js"></script>
+
 <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script> -->
 <!-- Add Firebase products that you want to use -->
-<script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script> -->
 <!-- <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script> -->
 <!-- <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-storage.js"></script> -->
-<script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-analytics.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-analytics.js"></script> -->
 <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
 <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -112,8 +120,8 @@ if (!isset ($_GET ['quiet'])) {
 <link type="text/css" rel="stylesheet" href="anneli/assets/css/all.min.css">
 <link type="text/css" rel="stylesheet" href="anneli/assets/css/style.css">
 <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-<script src="anneli/util.js?<?php echo time () ;?>"></script>
 <script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
+<script src="anneli/util.js?<?php echo time () ;?>"></script>
 <script src="anneli/colors.js?"></script>
 <script src="anneli/fonts.js?"></script>
 <!DOCTYPE html>
@@ -162,7 +170,7 @@ if (!isset ($_GET ['quiet'])) {
               <span class="sr-only">Loading...</span>
             </div>
 
-            <button class="btn btn-sm ml-2 nav-link btn-primary d-none" data-toggle="modal" data-target="#login" id="menu-login">
+            <button class="btn btn-sm ml-2 nav-link btn-primary d-none" data-bs-toggle="modal" data-bs-target="#login" id="menu-login">
               <i class="fa fa-shield-alt"></i> Login
             </button>
             
@@ -210,10 +218,14 @@ if (!isset ($_GET ['quiet'])) {
   <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">Menu</span>
     <nav class="mdl-navigation">
-      <a class="mdl-navigation__link" href="">Messages</a>
-      <a class="mdl-navigation__link" href="">Media</a>
-      <a class="mdl-navigation__link" href="">Contacts</a>
-      <a class="mdl-navigation__link" href="">About</a>
+      <?php
+        foreach ($config ["drawer-auth"] as $name => $link) {
+          echo "<a class='mdl-navigation__link' href='$link'>$name</a>";
+        }
+        foreach ($config ["drawer"] as $name => $link) {
+          echo "<a class='mdl-navigation__link' href='$link'>$name</a>";
+        }
+      ?>
     </nav>
   </div>
 
@@ -244,6 +256,3 @@ if (! $quiet) {
 </div> -->
 
 <?php } ?>
-<script>
-  const analytics = firebase.analytics();
-</script>

@@ -170,6 +170,8 @@ function init () {
     if (user) {
       fireuser = user
       console.log (user)
+      // console.log (analytics)
+      firebase.analytics().logEvent ("[load] " + user.email + ": " + location.href)
       // User is signed in.
       try {
         document.getElementById ("menu-login").classList.add ('d-none')
@@ -432,4 +434,38 @@ function transliterate_site_from_main () {
 
   cmd = "/api.php?q=" + url + '&lang=' + lang
   location.href = cmd
+}
+
+function db (table, action, data, success_func, error_func) {
+  $.ajax({
+    type: "POST",
+    url: "/anneli/api/db.php?table=" + table +"&action=" + action,
+    data: data,
+    success: function (data) {
+        console.log (data)
+        if (data.error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Message not sent.',
+                text: data.error
+              })
+
+        }
+        if (success_func)
+          success_func (data)
+    },
+    error: function (data) {
+        // console.log (data)
+        Swal.fire({
+            icon: 'error',
+            title: 'Message not sent.',
+            text: data.responseText
+          })
+        
+        if (error_func)
+          error_func (data)
+    },
+
+    dataType: "json"
+  });
 }

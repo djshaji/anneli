@@ -109,6 +109,27 @@ function db_insert ($table, $params, $redirect = true) {
     sql_exec ($sql, $redirect);
 }
 
+function db_update_or_insert ($table, $params, $colnames, $redirect = true) {
+    global $uid, $email;
+    $sql .= "select * from $table WHERE uid = '$uid' and " ;
+    foreach ($colnames as $col => $val) {
+        $count ++ ;
+        $sql .= "$col = '$val' " ;
+        if ($count < sizeof ($colnames))
+            $sql .= 'and ' ;
+    }
+
+    // die ($sql);
+    if (sql_exec ($sql, false) == []) {
+        foreach ($colnames as $name => $value) {
+            $params [$name] = $value ;
+        }
+        db_insert ($table, $params, $redirect);
+    }
+    else
+        db_update_multi ($table, $params, $colnames, $redirect) ;
+}
+
 function db_update ($table, $params, $colname, $value, $redirect = true) {
     global $uid, $email;
     // foreach ($params as $p => $v) {

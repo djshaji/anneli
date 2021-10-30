@@ -28,6 +28,8 @@ foreach ($data as $d) {
         <a class="list-group-item h5 d-flex justify-content-between align-items-center" href="/anneli/chat?to=<?php echo $sender -> {"uid"};?>">
           <span>
             <?php
+              $last_read = sql_exec ("SELECT stamp from chat where uid='$uid' and sender = '".$sender ->{"uid"}."' ORDER BY stamp DESC LIMIT 1", false)[0]["stamp"];
+              $unread = sizeof (sql_exec ("SELECT stamp from chat where uid='".$sender ->{"uid"}."' and stamp > '$last_read' ORDER BY stamp DESC", false));
               if ($sender -> {"photoUrl"} != null)
                 printf ("<img src='%s' width='32'>", $sender -> {"photoUrl"} ) ;
               else
@@ -38,7 +40,9 @@ foreach ($data as $d) {
               echo $sender -> {"email"} ;
               ?>
           </span>
-          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+          <?php if ($unread > 0) {?>
+          <span class="badge bg-primary rounded-pill"><?php echo $unread ;?></span>
+          <?php } ?>
         </a>
       <?php } ?>
       

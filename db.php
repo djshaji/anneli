@@ -101,10 +101,13 @@ function db_insert ($table, $params, $redirect = true) {
     //     if ($v == '')
     //         unset ($params [$p]) ;
     // }
+    if (! in_array ("uid", array_keys($params))) $params ["uid"] = $uid ;
+    if (! in_array ("email", array_keys($params))) $params ["email"] = $email ;
     $fields = implode(',', array_keys($params));
     // $qms    = array_fill(0, count($params), '?');
     $qms    = implode('\',\'', $params);
-    $sql = "INSERT INTO $table ($fields, uid, email) VALUES('$qms', \"$uid\", \"$email\")";
+    // $sql = "INSERT INTO $table ($fields, uid, email) VALUES('$qms', \"$uid\", \"$email\")";
+    $sql = "INSERT INTO $table ($fields) VALUES('$qms')";
     // die ($sql);
     sql_exec ($sql, $redirect);
 }

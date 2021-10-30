@@ -1,6 +1,4 @@
 <?php
-
-
 function post_json ($data) {
     $data_string = json_encode($data);                                                                                   
                                                                                                                          
@@ -293,6 +291,30 @@ function print_table ($data, $cols, $doc_cols, $doc_names, $url, $highlight = -1
     
     <div style='page-break-after:auto'></div>
     <?php
+}
+
+function messages_get_unread () {
+  global $uid, $auth ;
+  $un = 0 ;
+  $sql = "SELECT * from chat where uid = '$uid' or sender = '$uid'";
+  $data = sql_exec ($sql, false);
+  
+  $contacts = [];
+  foreach ($data as $d) {
+    foreach (["uid", "sender"] as $u)
+      if ($d [$u] != $uid && ! in_array ($d[$u], $contacts))
+        array_push ($contacts, $d [$u]);
+  
+  }  
+  
+  foreach ($contacts as $c) {
+    $sender = $auth -> getUser ($c) ;
+    $last_read = sql_exec ("SELECT stamp from chat where uid='$uid' and sender = '".$sender ->{"uid"}."' ORDER BY stamp DESC LIMIT 1", false)[0]["stamp"];
+    $unread = sizeof (sql_exec ("SELECT stamp from chat where uid='".$sender ->{"uid"}."' and stamp > '$last_read' ORDER BY stamp DESC", false));
+    $un = $un + $unread ;
+  }
+
+  return $un ;
 }
 
 ?>

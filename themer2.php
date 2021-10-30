@@ -50,7 +50,7 @@ if ($_GET ['skin'] != null)
     $skin = $_GET ['skin'];
 
 $theme = sprintf ("@import url('https://fonts.googleapis.com/css2?family=%s&display=swap');", str_replace (" ", "+", $font));
-$theme = file_get_contents ("assets/css/themes/". $skin ."/bootstrap.css");
+$theme .= file_get_contents ("assets/css/themes/". $skin ."/bootstrap.css");
 if ($font != null)
     $theme = str_replace ("bs-font-sans-serif: ", "bs-font-sans-serif: ". $font . ',', $theme) ;
 if ($colors != null && $colors != "default") {

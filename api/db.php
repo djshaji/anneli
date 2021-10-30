@@ -20,7 +20,7 @@ if ($uid == null) {
     ");
 }
 
-$json = file_get_contents('php://input');
+// $json = file_get_contents('php://input');
 $data = $_POST;
 if ($data == null) {
     die ("No data provided") ;
@@ -50,6 +50,8 @@ foreach ($actions as $action) {
 
             $sql = "SELECT token from tokens where tokenId = 'notification' and uid = '" . $data ['sender'] ."'";
             $to = sql_exec ($sql, false) [0]["token"];
+            if ($to == null)
+                return ;
             // echo ($to) ;
             // var_dump ($to);
             $messaging = $factory->createMessaging();

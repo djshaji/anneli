@@ -9,11 +9,18 @@ include 'anneli/token.php';
 define ("GOOGLE_FONTS_API_KEY", "AIzaSyCxoa3sC5zzGbePrKAPXHXsTqdNpg6jceE");
 // $build = "αlpha ". exec ("git rev-list HEAD --count");
 // $build_date = exec ("git log -1 --format=%cd") ;
+
+// first we parse the config
+$theme = $config ["theme"];
+$font = $config ["font"];
+$skin = $config ["skin"];
+
 if ($_COOKIE ['font'])
   $font = $_COOKIE ['font'];
 // if ($theme == null)
 if ($_COOKIE ['theme'])
   $theme = $_COOKIE ['theme'];
+
 if ($theme == null) {
   $theme = 'blue_deep_orange';
   // $theme = 'cyan_red';
@@ -149,6 +156,7 @@ if (!isset ($_GET ['quiet'])) {
   
   <div class="navbar navbar-expand-lg navbar-dark bg-<?php echo $config ['header-bg'] .' ' ; if ($config ['header'] == false) echo 'd-none' ;?>">
     <div class="container">
+      <div class="d-md-none ms-3"></div>
       <a href="../" class="navbar-brand">
         <!-- <span class="dogra category border p-1 pl-2 pr-2 shadow rounded-circle pb-2">𑠎</span> -->
         <img src="<?php echo $config ["logo"] ;?>" width=50>
@@ -156,8 +164,9 @@ if (!isset ($_GET ['quiet'])) {
       </a>
       <!-- <span id="email" class="badge bg-success text-white p-2"></span> -->
   
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <!-- <span class="navbar-toggler-icon"></span> -->
+        <i class="fas fa-ellipsis-v"></i>
       </button>
       <div class="justify-content-end collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav" id="navigation">          
@@ -234,25 +243,5 @@ if (!isset ($_GET ['quiet'])) {
 if (! $quiet) {
 ?>
 
-<!-- <div class="alert alert-danger h5" style="margin:0">
-  <i class="fas fa-info-circle"></i>
-  <a  href="https://docs.google.com/forms/d/e/1FAIpQLSd_IaXuKhNwnzk9g_IN5f80f_tD84f-dmN3YA2HTLA6YPvn8Q/viewform?usp=sf_link">Click here to upload </a>
-  if you are unable to upload your files on this portal or if your files are showing as <i>Not Properly Uploaded</i>.
-</div> -->
-<!-- <div class="alert alert-warning" style="margin:0">
-  <h5 class="m-3 mb-3"><i class="fas bold fa-exclamation-triangle"></i> &nbsp;&nbsp;The Course Code of Ability Enhancement Urdu Paper of Semester 5 has been wrongly mentioned as UURTS-501. Kindly read it as UURTS-503.</h5>
-  <i class="fas text-danger bold fa-times-circle"></i>&nbsp;UURTS-501<br>
-  <i class="fas fa-check-circle text-success bold"></i>&nbsp;UURTS-503
-</div>
-<div class="alert alert-success" style="margin:0">
-  <h5 class="m-3 mb-3"><i class="fas bold fa-exclamation-triangle"></i> &nbsp;&nbsp;Postponed Papers Notification</h5>
-  <ol class="list-group">
-    <li class="list-group-item list-group-item-action">
-      Exam of semVth in subject Biotechnology UBTTE 502 shall Be held on 19/05/21at 10am(morning session)  
-    
-    </li>
-  </ol>
-
-</div> -->
 
 <?php } ?>

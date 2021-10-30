@@ -20,6 +20,7 @@ foreach ($data as $d) {
 }
 ?>
 
+<?php if (sizeof ($contacts) > 0) {?>
 <div class="section">
   <div class="row justify-content-center">
     <ul class="list-group card col-md-6 m-3 p-3 shadow">
@@ -49,6 +50,15 @@ foreach ($data as $d) {
     </ul>
   </div>
 </div>
+<?php } else {?>
+<div class="section m-3">
+  <div class="container">
+    <div class="alert bg-info">
+      <h5><i class="fas fa-info-circle"></i>&nbsp;&nbsp;No messages</h5>
+    </div>
+  </div>
+</div>
+<?php }?>
 
 <?php
 include "anneli/footer.php" ;

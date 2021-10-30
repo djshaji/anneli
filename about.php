@@ -1,8 +1,10 @@
 <?php
-include "header.php" ;
+chdir ("/var/www/" . explode (".",$_SERVER ["HTTP_HOST"])[0]);
+include "config.php";
+include "anneli/header.php" ;
 
 $info = array () ;
-$info ['build'] = "αlpha ". exec ("git rev-list HEAD --count");
+$info ['build'] = "αlpha ". exec ("git rev-list HEAD --count") . " anneli ". exec ("cd anneli; git rev-list HEAD --count") ;
 $info ['build date'] = exec ("git log -1 --format=%cd") ;
 $info ['system'] = exec ("uname -sr") ;
 $info ['server'] = exec ("rpm -q httpd") ;
@@ -14,32 +16,17 @@ $info ['font'] = $font ;
  
 ?>
 
-<div class="jumbotron">
+<div class="jumbotron section m-4">
   <h1 class="display-4"><?php echo $codename ;?></h1>
   <p class="lead">
     <?php echo $description ;?>
-    Designed and Coded by <a href="https://shaji.in">Shaji</a>. <a href="#contact">Contact me</a> or <a href="https://shaji.in">visit my website</a>.
+    Designed and Coded by <a class="btn btn-primary" href="https://shaji.in">Shaji</a>. <a class="btn btn-primary" href="#contact">Contact me</a> or <a class="btn btn-primary" href="https://shaji.in">visit my website</a>.
   </p>
   <hr class="my-4">
   <p  class="lead">
-    The <?php echo $description ;?> is designed to conserve, popularize and promote 
-    <b>Native Scripts of Dogri </b>. <br>
-    <ul class="list-group">
-      <li class="lead active list-group-item list-group-item-action">The project has the following objectives</li>
-      <li class="list-group-item list-group-item-action">Protect the Native Dogri Script of <b>Namme Dogra Akkhar</b> </li>
-      <li class="list-group-item list-group-item-action">Protect the Native Dogri Script of <b>Takri</b> </li>
-      <li class="list-group-item list-group-item-action">Teaching the script to students</li>
-      <li class="list-group-item list-group-item-action">Promoting NLP research and Machine Translation in Dogri native scripts</li>
-    </ul>
+    <?php echo $description ;?> 
     <br>
-    <h3>How you can help</h3>
-    <p>
-    <ol class="list-group">
-      <li class="lead active list-group-item list-group-item-action">To contribute to the conservation of Native Dogri Scripts</li>
-      <li class="list-group-item list-group-item-action">Correct automatically transliterated words available on the portal using the <b class="text-primary">Read More</b> feature</li>
-      <li class="list-group-item list-group-item-action">Post new articles on the portal using the <b class="text-primary">Post New Article</b> feature by clicking this icon <i class="text-primary fas fa-plus-circle" style="font-size: 20;" aria-hidden="true"></i></li>
-    </ol>
-    </p>
+
     <p>
     <div class="d-print-none" id="contact">
       <h3>Contact Me
@@ -53,7 +40,6 @@ $info ['font'] = $font ;
         <!-- <label class="badge badge-info p-2">Contact me</label> -->
     </div>
 
-    For any comments, suggestions or feedback, or to collaborate on a research project / paper in Dogri Scripts and NLP, call or WhatsApp me.
     </p>
   </p>
 
@@ -83,5 +69,5 @@ $info ['font'] = $font ;
   </div>
 </section>
 <?php
-include "footer.php" ;
+include "anneli/footer.php" ;
 ?>

@@ -28,13 +28,17 @@ $filename = "/var/www/anneli-files/$uid/" . $_GET ["file"] ;
 // header('Content-Type' , 'application/octet-stream');
 // header('Content-Disposition', 'attachment; filename="' . basename ($filename) . '"');
 if (file_exists($filename)) {
-    $basename = basename ($filename);
+    $basename = explode ("___", basename ($filename)) [0];
     header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
     header("Cache-Control: public"); // needed for internet explorer
-    header("Content-Type: application/zip");
+    // header("Content-Type: application/zip");
     header("Content-Transfer-Encoding: Binary");
     header("Content-Length:".filesize($filename));
     header("Content-Disposition: attachment; filename=$basename");
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
     readfile($filename);
     die();        
 } else {

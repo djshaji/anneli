@@ -29,7 +29,7 @@ if ($data == null) {
 
 foreach ($_FILES as $f => $v) {
     // var_dump ($_FILES);
-    $target_file = sprintf ("../anneli-files/%s/%s-%s",
+    $target_file = sprintf ("../anneli-files/%s/%s___%s",
         $uid,$v ["name"],sha1 (time ())) ;
     mkdir (dirname ($target_file), 0777, true);
     if ($data [$f] == null) $data [$f] = array ();

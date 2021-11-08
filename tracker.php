@@ -45,7 +45,7 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
                 printf ("<td>%s</td>", $data [str_replace (" ", "_", $name)]);
               else {
                 foreach ($data [str_replace (" ", "_", $name)] as $filename => $path) {
-                  printf ("<td><a style=\"max-width: 150px;\" class='text-truncate btn btn-secondary' href='%s'>%s</a></td>", $path, $filename);
+                  printf ("<td><a style=\"max-width: 150px;\" class='text-truncate btn btn-secondary' href='/anneli/api/file?file=%s'>%s</a></td>", basename ($path), $filename);
                 }
               }
             }

@@ -63,7 +63,7 @@ $sender = $auth -> getUser ($to) ;
         </div>        
       </div>
 
-      <div class="col-2 mt-3">
+      <div class="col-md-2 mt-3">
         <button onclick="chat_send_message ();" class="m-1 btn btn-lg btn-primary">
           <i class="fas fa-paper-plane"></i>          
           Send

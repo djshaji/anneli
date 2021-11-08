@@ -436,11 +436,15 @@ function transliterate_site_from_main () {
   location.href = cmd
 }
 
-function db (table, action, data, success_func, error_func) {
+function db (table, action, data, success_func, error_func, mode = "db") {
+  // if (mode == "json") data ["module"] = location.pathname
   $.ajax({
     type: "POST",
-    url: "/anneli/api/db.php?table=" + table +"&action=" + action,
+    url: "/anneli/api/db.php?table=" + table +"&action=" + action + "&mode=" + mode,
     data: data,
+    processData:false,
+    contentType:false,
+    // contentType:'multipart/form-data',
     success: function (data) {
         console.log (data)
         if (data.error) {
@@ -468,4 +472,43 @@ function db (table, action, data, success_func, error_func) {
 
     dataType: "json"
   });
+}
+
+function form_to_json (id) {
+  form = ui (id) ;
+  data = new FormData ();
+
+  for (i of form.querySelectorAll ("input")) {
+    if (i.type == "file")
+      for (x of i.files)
+        data.append (i.id, x)
+    else
+      data.append (i.id, i.value)
+  }
+  
+  // console.log (data)
+  return data ;
+}
+
+function ajax_post (table, action, data, success_func, error_func, mode = "db") {
+  let xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      alert(this.responseText);
+      if (success_func) success_func () ;
+    } else {
+      console.log(this.status);
+      if (error_func) error_func () ;
+    }
+  };
+
+  ajaxurl = "/anneli/api/db.php?table=" + table +"&action=" + action + "&mode=" + mode ;
+
+  xhttp.open('POST', ajaxurl, true);
+  //xhttp.setRequestHeader("Content-type","multipart/form-data");
+  xhttp.send(data);
+}
+
+function basename (path) {
+  return path.split(/[\\/]/).pop();  
 }

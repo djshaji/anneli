@@ -317,4 +317,10 @@ function messages_get_unread () {
   return $un ;
 }
 
+function get_file ($path) {
+  header("X-Sendfile: $path");
+  header("Content-type: application/octet-stream");
+  header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+}
+
 ?>

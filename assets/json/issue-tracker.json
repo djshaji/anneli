@@ -1,0 +1,27 @@
+{
+    "Title": {
+        "type": "text",
+        "class": "col-12"
+    },
+    "Description": {
+        "type": "textarea"
+    },
+    "Priority": {
+        "type": "select",
+        "options": {
+            "Urgent": "urgent",
+            "Important": "important",
+            "Normal": "normal",
+            "When you get to it": "wygti"
+        }
+    },
+    "Assigned to": {
+        "type": "text"
+    },
+    "Finished By": {
+        "type": "date"
+    },
+    "Screenshot": {
+        "type": "file"
+    }
+}

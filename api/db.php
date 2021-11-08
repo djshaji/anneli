@@ -21,9 +21,37 @@ if ($uid == null) {
 }
 
 // $json = file_get_contents('php://input');
+// var_dump ($_FILES);
 $data = $_POST;
 if ($data == null) {
     die ("No data provided") ;
+}
+
+foreach ($_FILES as $f => $v) {
+    // var_dump ($_FILES);
+    $target_file = sprintf ("../anneli-files/%s/%s-%s",
+        $uid,$v ["name"],sha1 (time ())) ;
+    mkdir (dirname ($target_file), 0777, true);
+    if ($data [$f] == null) $data [$f] = array ();
+    // var_dump (error_get_last ());
+    if (! move_uploaded_file($_FILES[$f]["tmp_name"], $target_file) || $_FILES[$f]["error"] || ! file_exists ($target_file)) {
+        printf ('<script>
+        Swal.fire ("File not uploaded", "The file could not be uploaded. Try again.<br>%s", "error").then((e)=>{ 
+        location.href = "%s"
+        })
+
+        </script>',  $_FILES[$f]["error"], $_SERVER['HTTP_REFERER']);
+        die () ;
+      } else {
+        $data [$f][$v ["name"]] = $target_file;
+      }
+}      
+
+if ($_GET ["mode"] == "json") {
+    $data = array (
+        "data"=> json_encode ($data),
+        "module"=> $data ["module"]
+    );    
 }
 
 if (strpos ($_GET ["action"], "|") == -1)

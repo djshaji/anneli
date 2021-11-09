@@ -49,6 +49,7 @@ foreach ($_FILES as $f => $v) {
 }      
 
 if ($_GET ["mode"] == "json") {
+    if ($_GET ['action'] == "update") unset ($data ["where"]);
     $data = array (
         "data"=> json_encode ($data),
         "module"=> $data ["module"]

@@ -128,6 +128,14 @@ foreach ($actions as $action) {
             db_update_or_insert ($_GET ['table'], $data ["update"], $data ["where"], false);
             echo json_encode ("{code: 1}");
             break ;
+        case "delete":
+            // Ok so this needs to be very safe
+            if (!isset ($_GET ['table']) || ! isset ($data ["auto_id"]))
+                die () ;
+
+            db_delete ($_GET ["table"], $data ["auto_id"], false);
+            echo json_encode ("{code: 1}");
+            break ;
 
     }
 }

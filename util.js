@@ -438,13 +438,10 @@ function transliterate_site_from_main () {
 
 function db (table, action, data, success_func, error_func, mode = "db") {
   // if (mode == "json") data ["module"] = location.pathname
-  $.ajax({
+  request = {
     type: "POST",
     url: "/anneli/api/db.php?table=" + table +"&action=" + action + "&mode=" + mode,
     data: data,
-    processData:false,
-    contentType:false,
-    // contentType:'multipart/form-data',
     success: function (data) {
         console.log (data)
         if (data.error) {
@@ -471,7 +468,14 @@ function db (table, action, data, success_func, error_func, mode = "db") {
     },
 
     dataType: "json"
-  });
+  }
+
+  if (data.keys != null) { // is of type formdata
+    request.processData = false ;
+    request.contentType = false ;
+  }
+  
+  $.ajax(request);
 }
 
 function form_to_json (id, data_prefix = null) {
@@ -480,15 +484,17 @@ function form_to_json (id, data_prefix = null) {
   data_json = {}
   
 
-  for (i of form.querySelectorAll ("input")) {
-    if (i.type == "file")
-      for (x of i.files)
-        data.append (i.id, x)
-    else {
-      if (data_prefix == null)
-        data.append (i.id, i.value)
-      else
-        data_json [i.id] = i.value
+  for (element_ of ["input", "select"]) {
+    for (i of form.querySelectorAll (element_)) {
+      if (i.type == "file")
+        for (x of i.files)
+          data.append (i.id, x)
+      else {
+        if (data_prefix == null)
+          data.append (i.id, i.value)
+        else
+          data_json [i.id] = i.value
+      }
     }
   }
 

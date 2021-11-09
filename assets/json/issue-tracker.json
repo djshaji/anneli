@@ -9,10 +9,10 @@
     "Priority": {
         "type": "select",
         "options": {
-            "Urgent": "urgent",
-            "Important": "important",
-            "Normal": "normal",
-            "When you get to it": "wygti"
+            "urgent": "Urgent",
+            "important": "Important",
+            "normal": "Normal",
+            "wygti": "When you get to it"
         }
     },
     "Assigned to": {

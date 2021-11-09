@@ -45,8 +45,10 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
             echo "<tr><td>$counter</td>";
             $counter ++ ;
             foreach ($cols as $name => $array) {
-              if ($array ["type"] != "file")
-                printf ("<td>%s</td>", $data [str_replace (" ", "_", $name)]);
+              if ($array ["type"] == "select")
+                printf ("<td>%s</td>", $array ["options"][$data [$name]]);
+              else if ($array ["type"] != "file")
+                printf ("<td>%s</td>", ucwords ($data [str_replace (" ", "_", $name)]));
               else {
                 foreach ($data [str_replace (" ", "_", $name)] as $filename => $path) {
                   printf ("<td><a style=\"max-width: 150px;\" class='text-truncate btn btn-secondary' href='/anneli/api/file?file=%s'>%s</a></td>", basename ($path), $filename);
@@ -57,7 +59,7 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
             printf (
               "<td>
                 <button data-bs-toggle=\"modal\" data-bs-target=\"#add-issue\" onclick='load_form (this);' id='%s' class='btn btn-success m-1'><i class=\"fas fa-edit\"></i></button>
-                <button id='%s' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
+                <button id='%s' onclick='delete_entry (this) ;' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
               </td>", $d ["auto_id"], $d ["auto_id"]
             ) ;
 
@@ -109,9 +111,9 @@ include "anneli/footer.php" ;
                 default:
                   break ;
                 case "select":
-                  echo "<select name='$element' class='form-select $class' required>" ;
+                  echo "<select id='$element' name='$element' class='form-select $class' required>" ;
                   echo "<option value=''>$element</option>";
-                  foreach ($parameters ["options"] as $_o => $o) {
+                  foreach ($parameters ["options"] as $o => $_o) {
                     echo "<option value='$o'>$_o</option>";
                   }
 
@@ -177,17 +179,19 @@ function load_form (element) {
 
 function submit_form () {
   form = ui ("form")
-  for (i of form.querySelectorAll ("input")) {
-    if (i.value == "") {
-      Swal.fire(
-        'Incomplete data',
-        'Complete all details before saving.',
-        'warning'
-      ).then (function () {
-        i.focus () ;
-        i.classList.add ("is-invalid")
-      })
-      return ;
+  for (element_ of ["input", "select"]) {
+    for (i of form.querySelectorAll (element_)) {
+      if (i.value == "") {
+        Swal.fire(
+          'Incomplete data',
+          'Complete all details before saving.',
+          'warning'
+        ).then (function () {
+          i.focus () ;
+          i.classList.add ("is-invalid")
+        })
+        return ;
+      }
     }
   }
 
@@ -215,5 +219,13 @@ function update_form () {
   // }
 
   db ("store", "update", formdata, null, null, "json")
+}
+
+function delete_entry (button) {
+  data = {
+    "auto_id": button.id
+  }
+
+  db ("store", "delete", data, null, null);
 }
 </script>

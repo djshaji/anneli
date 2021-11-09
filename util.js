@@ -474,17 +474,26 @@ function db (table, action, data, success_func, error_func, mode = "db") {
   });
 }
 
-function form_to_json (id) {
+function form_to_json (id, data_prefix = null) {
   form = ui (id) ;
   data = new FormData ();
+  data_json = {}
+  
 
   for (i of form.querySelectorAll ("input")) {
     if (i.type == "file")
       for (x of i.files)
         data.append (i.id, x)
-    else
-      data.append (i.id, i.value)
+    else {
+      if (data_prefix == null)
+        data.append (i.id, i.value)
+      else
+        data_json [i.id] = i.value
+    }
   }
+
+  if (data_prefix)
+    data.append (data_prefix, data_json)
   
   // console.log (data)
   return data ;
@@ -511,4 +520,8 @@ function ajax_post (table, action, data, success_func, error_func, mode = "db") 
 
 function basename (path) {
   return path.split(/[\\/]/).pop();  
+}
+
+function uin (name) {
+  return document.getElementsByName (name)[0]
 }

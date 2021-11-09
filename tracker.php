@@ -35,8 +35,12 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
         <tbody>
           <?php 
           $counter = 1; 
+          $data_json = array () ;
+
           foreach ($data as $d) {
+            // var_dump ($d ["auto_id"]);
             $data = json_decode ($d ["data"], true);
+            $data_json [$d ['auto_id']] = $data ;
             // var_dump ($data);
             echo "<tr><td>$counter</td>";
             $counter ++ ;
@@ -52,9 +56,9 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
 
             printf (
               "<td>
-                <button class='btn btn-success m-1'><i class=\"fas fa-edit\"></i></button>
-                <button class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
-              </td>",
+                <button data-bs-toggle=\"modal\" data-bs-target=\"#add-issue\" onclick='load_form (this);' id='%s' class='btn btn-success m-1'><i class=\"fas fa-edit\"></i></button>
+                <button id='%s' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
+              </td>", $d ["auto_id"], $d ["auto_id"]
             ) ;
 
             echo "</tr>";
@@ -65,14 +69,21 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
     </div>
 
     <div class="row">
-      <button class="shadow btn btn-lg btn-primary mx-auto col-md-2 m-2" data-bs-toggle="modal" data-bs-target="#add-issue">
+      <button onclick="form_reset ()" class="shadow btn btn-lg btn-primary mx-auto col-md-2 m-2" data-bs-toggle="modal" data-bs-target="#add-issue">
         <i class="fas fa-plus-circle"></i>
         Add Issue
       </button>
     </div>
   </div>
 </div>
-
+<?php
+printf (
+  "<script>
+    let json_data = JSON.parse ('%s') ;
+  </script>",
+  json_encode ($data_json)
+) ;
+?>
 <?php
 include "anneli/footer.php" ;
 ?>
@@ -110,7 +121,7 @@ include "anneli/footer.php" ;
                   $style .= "height: 100px";
                 case "date":
                 case "file":
-                  $fname .= "[]";
+                  // $fname .= "[]";
                 case "text":
                   printf (
                     '<div class="form-floating mb-3 %s">
@@ -125,13 +136,45 @@ include "anneli/footer.php" ;
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
         <button onclick="submit_form ()" id="form-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
+        <button onclick="update_form ()" id="form-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
       </div>
     </div>
   </div>
 </div>
 <script>
+function form_reset () {
+  ui ("form-submit").classList.remove ("d-none")
+  ui ("form-update").classList.add ("d-none")
+  for (i of document.getElementsByTagName ("input")) {
+    i.value = ""
+  }
+  
+  ui("add-issue").auto_id = -1
+}
+
+function load_form (element) {
+  ui ("form-submit").classList.add ("d-none")
+  ui ("form-update").classList.remove ("d-none")
+  for (i in json_data [element.id]) {
+    input = uin (i.replace ("_", " ")) ;
+    console.log (i, json_data [element.id])
+    if (input != null) {
+      try {
+        input.value = json_data [element.id][i]
+      } catch (e) {
+        console.error (e)
+      }
+    }
+    else
+      console.log("No element:", i)
+  }
+
+  console.log ("element id", element.id)
+  ui("add-issue").setAttribute ("auto_id", element.id)
+}
+
 function submit_form () {
   form = ui ("form")
   for (i of form.querySelectorAll ("input")) {
@@ -151,5 +194,26 @@ function submit_form () {
   formdata = form_to_json ("form") ;
   formdata.append ("module", location.pathname)
   db ("store", "insert", formdata, null, null, "json")
+}
+
+function update_form () {
+  form = ui ("form")
+
+  formdata = form_to_json ("form") ;
+  formdata.append ("module", location.pathname)
+  where = {
+    auto_id: ui ("add-issue").getAttribute ("auto_id")
+  } ;
+
+  formdata.append ("where", JSON.stringify (where))
+
+  // update_data = {
+  //   "update": formdata,
+  //   "where": {
+  //     "auto_id": ui ("add-issue").auto_id
+  //   }
+  // }
+
+  db ("store", "update", formdata, null, null, "json")
 }
 </script>

@@ -22,6 +22,7 @@ if ($uid == null) {
 
 // $json = file_get_contents('php://input');
 // var_dump ($_FILES);
+// var_dump ($_POST);
 $data = $_POST;
 if ($data == null) {
     die ("No data provided") ;
@@ -52,7 +53,15 @@ if ($_GET ["mode"] == "json") {
         "data"=> json_encode ($data),
         "module"=> $data ["module"]
     );    
+
+    if ($_GET ['action'] == "update") {
+        $data = array (
+            "update" => $data,
+            "where" => json_decode ($_POST ['where'], true)
+        );
+    }
 }
+
 
 if (strpos ($_GET ["action"], "|") == -1)
     $actions = [$_GET ["action"]] ;
@@ -104,7 +113,8 @@ foreach ($actions as $action) {
             $data ["update"]['stamp'] = time ();
             $data ["where"]['uid'] = $uid ;
             
-            db_update ($_GET ['table'], $data ['update'], $data ['where'], false);
+            // db_update ($_GET ['table'], $data ['update'], $data ['where'], false);
+            db_update_multi ($_GET ['table'], $data ['update'], $data ['where'], false);
             echo json_encode ("{code: 1}");
             break ;
         case "updatei":

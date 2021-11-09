@@ -531,3 +531,150 @@ function basename (path) {
 function uin (name) {
   return document.getElementsByName (name)[0]
 }
+
+// ui.php
+
+function form_reset (dialog)  {
+  ui (dialog + "-submit").classList.remove ("d-none")
+  ui (dialog + "-update").classList.add ("d-none")
+  for (i of document.getElementsByTagName ("input")) {
+    i.value = ""
+  }
+  
+  ui(dialog).auto_id = -1
+}
+
+function load_form (dialog, element) {
+  ui (dialog + "-submit").classList.add ("d-none")
+  ui (dialog + "-update").classList.remove ("d-none")
+  for (i in json_data [element.id]) {
+    input = uin (i.replace ("_", " ")) ;
+    console.log (i, json_data [element.id])
+    if (input != null) {
+      try {
+        input.value = json_data [element.id][i]
+      } catch (e) {
+        console.error (e)
+      }
+    }
+    else
+      console.log("No element:", i)
+  }
+
+  console.log ("element id", element.id)
+  ui(dialog).setAttribute ("auto_id", element.id)
+}
+
+function submit_form (dialog, mode =  "json") {
+  console.log (dialog)
+  form = ui (dialog + "-form")
+  for (element_ of ["input", "select"]) {
+    for (i of form.querySelectorAll (element_)) {
+      if (i.value == "") {
+        Swal.fire(
+          'Incomplete data',
+          'Complete all details before saving.',
+          'warning'
+        ).then (function () {
+          i.focus () ;
+          i.classList.add ("is-invalid")
+        })
+        return ;
+      }
+    }
+  }
+
+  formdata = form_to_json (dialog + "-form") ;
+  formdata.append ("module", location.pathname)
+  db ("store", "insert", formdata, function () {
+    Swal.fire(
+      'Data saved',
+      'Your information was saved successfully',
+      'success'
+    ).then (function () {
+      location.reload () ;
+    })
+    
+    $(dialog).modal ("hide") ;
+  }, function () {
+    Swal.fire(
+      'Data not saved',
+      'Your information could not be saved successfully',
+      'error'
+    )
+  }, mode)
+}
+
+function update_form (dialog, mode = "json") {
+  form = ui (dialog + "-form")
+
+  formdata = form_to_json (dialog + "-form") ;
+  formdata.append ("module", location.pathname)
+  where = {
+    auto_id: ui (dialog).getAttribute ("auto_id")
+  } ;
+
+  formdata.append ("where", JSON.stringify (where))
+
+  // update_data = {
+  //   "update": formdata,
+  //   "where": {
+  //     "auto_id": ui ("add-issue").auto_id
+  //   }
+  // }
+
+  db ("store", "update", formdata, function () {
+    Swal.fire(
+      'Data saved',
+      'Your information was saved successfully',
+      'success'
+    ).then (function () {
+      location.reload () ;
+    }) ;
+
+    $(dialog).modal ("hide") ;
+    // location.reload () ;
+  }, function () {
+    Swal.fire(
+      'Data not saved',
+      'Your information could not be saved successfully',
+      'error'
+    )
+  }, mode)
+}
+
+function delete_entry (button) {
+  Swal.fire({
+    title: 'Delete data?',
+    text: "Are you sure you want to delete this data?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete',
+    cancelButtonColor: '#3085d6',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      data = {
+        "auto_id": button.id
+      }
+
+      db ("store", "delete", data, function () {
+        Swal.fire(
+          'Data deleted',
+          'Your information was deleted successfully',
+          'success'
+        ).then (function () {
+          location.reload () ;
+        });
+
+      }, function (data) {
+        Swal.fire(
+          'Data not deleted',
+          'Your information could not be deleted successfully',
+          'error'
+        ) ;
+        console.log (data);
+      }) ;
+    }
+  })
+}

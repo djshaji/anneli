@@ -3,6 +3,7 @@ chdir ("/var/www/" . explode (".",$_SERVER ["HTTP_HOST"])[0]);
 include "config.php";
 include "anneli/header.php" ;
 include "anneli/db.php" ;
+include "anneli/ui.php" ;
 
 $cols = json_decode (file_get_contents("anneli/assets/json/issue-tracker.json"), true);
 $basename = $_SERVER['REQUEST_URI'] ;
@@ -22,210 +23,18 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
       </div>
     </div>
 
-    <div class="row table-responsive">
-      <table class="table table-hover table-striped">
-        <thead>
-          <th>S. No</th>
-          <?php foreach ($cols as $name => $array) {
-            echo "<th>$name</th>" ;
-          }
-          ?>
-          <th></th>
-        </thead>
-        <tbody>
-          <?php 
-          $counter = 1; 
-          $data_json = array () ;
+    <?php 
+      ui_table ($data, $cols, "Issue");
+      ui_table_dialog ($cols, "Issue");
+    ?>
 
-          foreach ($data as $d) {
-            // var_dump ($d ["auto_id"]);
-            $data = json_decode ($d ["data"], true);
-            $data_json [$d ['auto_id']] = $data ;
-            // var_dump ($data);
-            echo "<tr><td>$counter</td>";
-            $counter ++ ;
-            foreach ($cols as $name => $array) {
-              if ($array ["type"] == "select")
-                printf ("<td>%s</td>", $array ["options"][$data [$name]]);
-              else if ($array ["type"] != "file")
-                printf ("<td>%s</td>", ucwords ($data [str_replace (" ", "_", $name)]));
-              else {
-                foreach ($data [str_replace (" ", "_", $name)] as $filename => $path) {
-                  printf ("<td><a style=\"max-width: 150px;\" class='text-truncate btn btn-secondary' href='/anneli/api/file?file=%s'>%s</a></td>", basename ($path), $filename);
-                }
-              }
-            }
-
-            printf (
-              "<td>
-                <button data-bs-toggle=\"modal\" data-bs-target=\"#add-issue\" onclick='load_form (this);' id='%s' class='btn btn-success m-1'><i class=\"fas fa-edit\"></i></button>
-                <button id='%s' onclick='delete_entry (this) ;' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
-              </td>", $d ["auto_id"], $d ["auto_id"]
-            ) ;
-
-            echo "</tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="row">
-      <button onclick="form_reset ()" class="shadow btn btn-lg btn-primary mx-auto col-md-2 m-2" data-bs-toggle="modal" data-bs-target="#add-issue">
-        <i class="fas fa-plus-circle"></i>
-        Add Issue
-      </button>
-    </div>
   </div>
 </div>
-<?php
-printf (
-  "<script>
-    let json_data = JSON.parse ('%s') ;
-  </script>",
-  json_encode ($data_json)
-) ;
-?>
+
 <?php
 include "anneli/footer.php" ;
 ?>
 
-<!-- Modal -->
-<div class="modal fade" id="add-issue" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Add Issue</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form method="post"  enctype="multipart/form-data" id="form" class="row p-3 input-group">
-          <?php
-            foreach ($cols as $element => $parameters) {
-              $class = $parameters ["class"] ;
-              $style = "";
-              $fname = $element ;
-              if ($class = null) $class = "col-md-6";
-
-              switch ($parameters ["type"]) {
-                default:
-                  break ;
-                case "select":
-                  echo "<select id='$element' name='$element' class='form-select $class' required>" ;
-                  echo "<option value=''>$element</option>";
-                  foreach ($parameters ["options"] as $o => $_o) {
-                    echo "<option value='$o'>$_o</option>";
-                  }
-
-                  echo "</select>";
-                  break ;
-                case "textarea":
-                  $style .= "height: 100px";
-                case "date":
-                case "file":
-                  // $fname .= "[]";
-                case "text":
-                  printf (
-                    '<div class="form-floating mb-3 %s">
-                      <input multiple name="%s" onchange="this.classList.remove (\'is-invalid\');" required style="%s" type="%s" class="form-control" id="%s" placeholder="%s">
-                      <label for="floatingInput">%s</label>
-                    </div>', $class, $fname, $style, $parameters ["type"], $element, $element, $element
-                  ) ;
-                  break ;
-              }
-            }
-          ?>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
-        <button onclick="submit_form ()" id="form-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
-        <button onclick="update_form ()" id="form-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
-      </div>
-    </div>
-  </div>
-</div>
 <script>
-function form_reset () {
-  ui ("form-submit").classList.remove ("d-none")
-  ui ("form-update").classList.add ("d-none")
-  for (i of document.getElementsByTagName ("input")) {
-    i.value = ""
-  }
-  
-  ui("add-issue").auto_id = -1
-}
 
-function load_form (element) {
-  ui ("form-submit").classList.add ("d-none")
-  ui ("form-update").classList.remove ("d-none")
-  for (i in json_data [element.id]) {
-    input = uin (i.replace ("_", " ")) ;
-    console.log (i, json_data [element.id])
-    if (input != null) {
-      try {
-        input.value = json_data [element.id][i]
-      } catch (e) {
-        console.error (e)
-      }
-    }
-    else
-      console.log("No element:", i)
-  }
-
-  console.log ("element id", element.id)
-  ui("add-issue").setAttribute ("auto_id", element.id)
-}
-
-function submit_form () {
-  form = ui ("form")
-  for (element_ of ["input", "select"]) {
-    for (i of form.querySelectorAll (element_)) {
-      if (i.value == "") {
-        Swal.fire(
-          'Incomplete data',
-          'Complete all details before saving.',
-          'warning'
-        ).then (function () {
-          i.focus () ;
-          i.classList.add ("is-invalid")
-        })
-        return ;
-      }
-    }
-  }
-
-  formdata = form_to_json ("form") ;
-  formdata.append ("module", location.pathname)
-  db ("store", "insert", formdata, null, null, "json")
-}
-
-function update_form () {
-  form = ui ("form")
-
-  formdata = form_to_json ("form") ;
-  formdata.append ("module", location.pathname)
-  where = {
-    auto_id: ui ("add-issue").getAttribute ("auto_id")
-  } ;
-
-  formdata.append ("where", JSON.stringify (where))
-
-  // update_data = {
-  //   "update": formdata,
-  //   "where": {
-  //     "auto_id": ui ("add-issue").auto_id
-  //   }
-  // }
-
-  db ("store", "update", formdata, null, null, "json")
-}
-
-function delete_entry (button) {
-  data = {
-    "auto_id": button.id
-  }
-
-  db ("store", "delete", data, null, null);
-}
 </script>

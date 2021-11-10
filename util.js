@@ -565,7 +565,7 @@ function load_form (dialog, element) {
   ui(dialog).setAttribute ("auto_id", element.id)
 }
 
-function submit_form (dialog, mode =  "json") {
+function submit_form (dialog, database, mode =  "json") {
   console.log (dialog)
   form = ui (dialog + "-form")
   for (element_ of ["input", "select"]) {
@@ -586,7 +586,7 @@ function submit_form (dialog, mode =  "json") {
 
   formdata = form_to_json (dialog + "-form") ;
   formdata.append ("module", location.pathname)
-  db ("store", "insert", formdata, function () {
+  db (database, "insert", formdata, function () {
     Swal.fire(
       'Data saved',
       'Your information was saved successfully',
@@ -605,7 +605,7 @@ function submit_form (dialog, mode =  "json") {
   }, mode)
 }
 
-function update_form (dialog, mode = "json") {
+function update_form (dialog, database, mode = "json") {
   form = ui (dialog + "-form")
 
   formdata = form_to_json (dialog + "-form") ;
@@ -623,7 +623,7 @@ function update_form (dialog, mode = "json") {
   //   }
   // }
 
-  db ("store", "update", formdata, function () {
+  db (database, "update", formdata, function () {
     Swal.fire(
       'Data saved',
       'Your information was saved successfully',
@@ -643,7 +643,7 @@ function update_form (dialog, mode = "json") {
   }, mode)
 }
 
-function delete_entry (button) {
+function delete_entry (button, database) {
   Swal.fire({
     title: 'Delete data?',
     text: "Are you sure you want to delete this data?",
@@ -658,7 +658,7 @@ function delete_entry (button) {
         "auto_id": button.id
       }
 
-      db ("store", "delete", data, function () {
+      db (database, "delete", data, function () {
         Swal.fire(
           'Data deleted',
           'Your information was deleted successfully',

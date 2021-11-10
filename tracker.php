@@ -24,8 +24,8 @@ $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basenam
     </div>
 
     <?php 
-      ui_table ($data, $cols, "Issue");
-      ui_table_dialog ($cols, "Issue");
+      ui_table ($data, $cols, "Issue", "store");
+      ui_table_dialog ($cols, "Issue", "store");
     ?>
 
   </div>

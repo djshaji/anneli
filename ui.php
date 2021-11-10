@@ -1,5 +1,5 @@
 <?php
-function ui_table ($data, $cols, $title) {
+function ui_table ($data, $cols, $title, $database) {
   $id = str_replace (" ", "-", $title);
   ?>
     <div class="row table-responsive">
@@ -39,8 +39,8 @@ function ui_table ($data, $cols, $title) {
             printf (
               "<td>
                 <button data-bs-toggle=\"modal\" data-bs-target=\"#%s\" onclick='load_form (\"%s\", this);' id='%s' class='btn btn-success m-1'><i class=\"fas fa-edit\"></i></button>
-                <button id='%s' onclick='delete_entry (this) ;' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
-              </td>", $id, $id, $d ["auto_id"], $d ["auto_id"]
+                <button id='%s' onclick='delete_entry (this, \"%s\") ;' class='btn btn-danger m-1'><i class=\"fas fa-minus-circle\"></i></button>
+              </td>", $id, $id, $d ["auto_id"], $d ["auto_id"], $database
             ) ;
 
             echo "</tr>";
@@ -58,7 +58,7 @@ function ui_table ($data, $cols, $title) {
   ) ;
 }
 
-function ui_table_dialog ($cols, $title) {
+function ui_table_dialog ($cols, $title, $database) {
   $id = str_replace (" ", "-", $title);
   ?>
     <div class="row">
@@ -118,8 +118,8 @@ function ui_table_dialog ($cols, $title) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
-          <button onclick="submit_form ('<?php echo $title ;?>')" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
-          <button onclick="update_form ('<?php echo $title ;?>')" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
+          <button onclick="submit_form ('<?php echo $title ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
+          <button onclick="update_form ('<?php echo $title ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ if ($uid == null) {
     die;
 }
 
-$filename = "/var/www/anneli-files/$uid/" . $_GET ["file"] ;
+$filename = $config ["filesdir"] . '/'. $uid . "/" . $_GET ["file"] ;
 // echo $filename ;
 
 // header('X-Sendfile', $filename);

@@ -27,22 +27,30 @@ $filename = $config ["filesdir"] . '/'. $uid . "/" . $_GET ["file"] ;
 // header('X-Sendfile', $filename);
 // header('Content-Type' , 'application/octet-stream');
 // header('Content-Disposition', 'attachment; filename="' . basename ($filename) . '"');
-if (file_exists($filename)) {
-    $basename = explode ("___", basename ($filename)) [0];
-    header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
-    header("Cache-Control: public"); // needed for internet explorer
-    // header("Content-Type: application/zip");
-    header("Content-Transfer-Encoding: Binary");
-    header("Content-Length:".filesize($filename));
-    header("Content-Disposition: attachment; filename=$basename");
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    
-    readfile($filename);
-    die();        
-} else {
-    die("Error: File not found.");
-} 
-
+switch ($_GET ["action"]) {
+    case "open":
+    default:
+        if (file_exists($filename)) {
+            $basename = explode ("___", basename ($filename)) [0];
+            header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+            header("Cache-Control: public"); // needed for internet explorer
+            // header("Content-Type: application/zip");
+            header("Content-Transfer-Encoding: Binary");
+            header("Content-Length:".filesize($filename));
+            header("Content-Disposition: attachment; filename=$basename");
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            
+            readfile($filename);
+            die();        
+        } else {
+            die("Error: File not found.");
+        } 
+        break ;
+    case "delete":
+        unlink ($filename);
+        die ("{code:1}");
+        break ;
+}
 ?>

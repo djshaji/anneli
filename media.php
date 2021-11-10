@@ -22,7 +22,7 @@ $files = scandir ($config ["filesdir"] . "/". $uid) ;
             <div class="card mdl-shadow--4dp">
               <div class="card-header d-flex bg-info text-white">
                 <span class="flex-fill align-self-center"><?php $m = mime_content_type ($f) ; if ($m) echo ucwords ($m) ; else echo "File";?></span>
-                <button class="btn-danger btn btn-sm"><i class="fas fa-window-close"></i></button>
+                <button onclick="delete_file ('<?php echo $f ;?>');" class="btn-danger btn btn-sm"><i class="fas fa-window-close"></i></button>
               </div>
               <div class="card-body">
                 <h5 class="card-title"><?php echo explode (".", $f)[0] ;?></h5>

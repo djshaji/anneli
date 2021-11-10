@@ -678,3 +678,37 @@ function delete_entry (button, database) {
     }
   })
 }
+
+function delete_file (filename) {
+  Swal.fire({
+    title: 'Delete file?',
+    text: "Are you sure you want to delete this file?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete',
+    cancelButtonColor: '#3085d6',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "/anneli/api/file?file=" + filename + "&action=delete"
+      }).done (function () {
+        Swal.fire(
+          'Data deleted',
+          'Your information was deleted successfully',
+          'success'
+        ).then (function () {
+          location.reload () ;
+        });
+
+      }).error (function (data) {
+        Swal.fire(
+          'Data not deleted',
+          'Your information could not be deleted successfully',
+          'error'
+        ) ;
+        console.log (data);
+      }) ;
+    }
+  })
+}

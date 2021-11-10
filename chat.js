@@ -139,3 +139,16 @@ function JSClock() {
     temp += (hour >= 12) ? ' pm' : ' am';
     return temp;
 }
+
+function chat_attach_file (input) {
+    console.log (input)
+    ui ("image-attach").classList.remove ("d-none")
+    if (FileReader && input.files && input.files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById("image-attach").src = fr.result;
+        }
+        
+        fr.readAsDataURL(input.files[0]);
+    }
+}

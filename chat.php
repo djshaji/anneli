@@ -57,21 +57,24 @@ $sender = $auth -> getUser ($to) ;
       </div>
 
       <div class="col-md-6 card shadow m-3 border border-primary">
-        <div class="form-floating">
+        <div class="form-floating position-relative">
           <textarea class="form-control" placeholder="Type a message" id="message" style="height: 100px"></textarea>
           <label for="message">Type a message</label>
+          <img id="image-attach" class='card position-absolute mt-2 top-0 end-0 d-none' height="80">
+          <i class="fas fa-times-circle position-absolute mt-2 top-0 end-0 text-danger p-1"></i>
         </div>        
       </div>
 
-      <div class="col-md-2 mt-3">
+      <div class="col-md-2 mt-3 row">
         <button onclick="chat_send_message ();" class="m-1 btn btn-lg btn-primary">
           <i class="fas fa-paper-plane"></i>          
           Send
         </button>
-        <button class="btn m-1 btn-lg btn-info">
+        <button class="btn btn-lg col-6 flex-fill btn-info m-1" onclick="this.children [0].click ()">
+          <input id="image-input" type="file" hidden onchange="chat_attach_file (this);">
           <i class="fas fa-image"></i>        
         </button>
-        <button class="btn m-1 btn-lg btn-success">
+        <button class="btn btn-lg col-5 mt-1 mb-1 ms-1 btn-success">
           <i class="fas fa-video"></i>        
         </button>
       </div>

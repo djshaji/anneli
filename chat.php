@@ -84,7 +84,10 @@ $sender = $auth -> getUser ($to) ;
       <div class="col-md-2 mt-3 row">
         <button onclick="chat_send_message ();" class="m-1 btn btn-lg btn-primary">
           <i class="fas fa-paper-plane"></i>          
-          Send
+          Send &nbsp;
+          <div id="send-spinner" class="d-none spinner-border spinner-border-sm text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </button>
         <button class="btn btn-lg col-6 flex-fill btn-info m-1" onclick="this.children [0].click ()">
           <input id="image-input" type="file" hidden onchange="chat_attach_file (this);">

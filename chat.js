@@ -1,4 +1,5 @@
 function chat_send_message () {
+    ui ("send-spinner").classList.remove ("d-none")
     msg = $("#message").val () ;
     image = ui ("image-input").files [0] ;
 
@@ -35,6 +36,7 @@ function chat_send_message () {
         ui ("message").scrollIntoView (true)
         ui ("message").value = ""
         chat_remove_attachment () ;
+        ui ("send-spinner").classList.add ("d-none")
     },function (data) {
         console.log (data)
         Swal.fire({
@@ -42,7 +44,7 @@ function chat_send_message () {
             title: 'Message not sent.',
             text: data.responseText
           })
-          
+          ui ("send-spinner").classList.add ("d-none")          
     });
 
     /*
@@ -104,9 +106,27 @@ function chat_message (own, message) {
     if (own) {
         for (i of [
             'text-end', 'btn-lg', 'list-group-item', 'list-group-item-action'
-        ])
+        ]) {
             c.classList.add (i)
+        }
+         
         c.innerHTML = message + '&nbsp;<sup class="badge text-white bg-primary m-1" style="opacity:80%;font-size:60%">' + JSClock () + '</sup>'
+
+        var fr = new FileReader();
+        image = ui ("image-input").files [0]
+        img_container = uic ("div");
+        if (image != null) {
+            img_element = uic ("img")
+            img_element.setAttribute ("height", "256px");
+            fr.onload = function () {
+                img_element.src = fr.result;
+            }
+    
+            fr.readAsDataURL(image);
+            img_container.appendChild (img_element)
+            c.prepend (img_container)
+        }
+
     } else {
         for (i of [
             'active', 'btn-lg', 'card', 'list-group-item', 'list-group-item-action'

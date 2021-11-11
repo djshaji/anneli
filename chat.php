@@ -46,9 +46,25 @@ $sender = $auth -> getUser ($to) ;
               $badge = "badge text-white bg-primary m-1";
             }
 
-            $message = $d ['message'];
+            switch ($d ["type"]) {
+              case "message":
+              default:
+                $message = $d ['message'];              
+                break ;
+              case "image":
+                $filename = null ;
+                foreach (json_decode ($d ["files"], true) as $df => $fn)
+                  $filename = "/anneli/api/file?file=" . $fn ;
+                $message = sprintf (
+                  "<button onclick='ui (\"lightbox\").src=\"%s\"' class='btn btn-secondary' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop\" data-img='%s'><img src='%s' height='256px'></button> %s",
+                  $filename, $filename, $filename, $d ["message"]
+                ) ;
+                break;
+            }
+
             $time = date ("F j, y g:i a", $d ['stamp']);
-            echo "<a href='#' class='$class'>$message&nbsp;<sup class='$badge' style='opacity:80%;font-size:60%'>$time</sup></a>";
+            
+            echo "<div class='$class'>$message&nbsp;<sup class='$badge' style='opacity:80%;font-size:60%'>$time</sup></div>";
           }
         ?>
         <!-- <a href="#" class="active btn-lg card list-group-item list-group-item-action">Hi&nbsp;<sup class="badge text-muted bg-secondary m-1" style="opacity:80%;font-size:60%">11:30 pm</sup></a>
@@ -92,6 +108,16 @@ $sender = $auth -> getUser ($to) ;
   chat_register_token ()
   chat_init ()
 </script>
+
+<div class="modal modal-fullscreen fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <img id="lightbox" style="max-width:100%;max-height:100%">
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
+      </div>
+
+  </div>
+</div>
 <?php
 include "anneli/footer.php" ;
 ?>

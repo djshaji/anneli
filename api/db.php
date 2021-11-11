@@ -44,7 +44,7 @@ foreach ($_FILES as $f => $v) {
         </script>',  $_FILES[$f]["error"], $_SERVER['HTTP_REFERER']);
         die () ;
       } else {
-        $data [$f][$v ["name"]] = $target_file;
+        $data [$f][$v ["name"]] = basename ($target_file);
       }
 }      
 
@@ -61,9 +61,9 @@ if ($_GET ["mode"] == "json") {
             "where" => json_decode ($_POST ['where'], true)
         );
     }
-}
+} 
 
-
+// var_dump ($data);
 if (strpos ($_GET ["action"], "|") == -1)
     $actions = [$_GET ["action"]] ;
 else
@@ -76,7 +76,7 @@ foreach ($actions as $action) {
         case "notify":
             $title = $_SERVER ["HTTP_HOST"];
             $body = $data ['message'];
-            $imageUrl = 'https://letsgodil.in/anneli/assets/img/logo.png';
+            $imageUrl = $config ["logo"];
 
             $notification = Notification::fromArray([
                 'title' => $title,
@@ -85,17 +85,24 @@ foreach ($actions as $action) {
             ]);
 
             // $notification = Notification::create($title, $body);
-
+            $xdata = array () ;
+            foreach ($data as $d => $v) {
+                if (gettype ($v) == "array") {
+                    $xdata [$d] = json_encode ($v) ;
+                } else #if (gettype ($v) == "string")
+                    $xdata [$d] = $v ;
+            }
+                
             $sql = "SELECT token from tokens where tokenId = 'notification' and uid = '" . $data ['sender'] ."'";
             $to = sql_exec ($sql, false) [0]["token"];
             if ($to == null)
                 return ;
             // echo ($to) ;
-            // var_dump ($to);
+            // var_dump ($data);
             $messaging = $factory->createMessaging();
             $message = CloudMessage::withTarget('token', $to)
                 ->withNotification($notification)
-                ->withData($data);
+                ->withData($xdata);
             $messaging->send($message);
             break ;
         case "insert":
@@ -103,8 +110,16 @@ foreach ($actions as $action) {
                 die () ;
             
             $data ['stamp'] = time ();
+            $xdata = array () ;
+            foreach ($data as $d => $v) {
+                if (gettype ($v) == "array") {
+                    $xdata [$d] = json_encode ($v) ;
+                } else #if (gettype ($v) == "string")
+                    $xdata [$d] = $v ;
+            }
+                
             
-            db_insert ($_GET ['table'], $data, false);
+            db_insert ($_GET ['table'], $xdata, false);
             echo json_encode ("{code: 1}");
             break ;
         case "update":

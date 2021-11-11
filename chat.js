@@ -1,15 +1,51 @@
 function chat_send_message () {
     msg = $("#message").val () ;
-    if (msg == '') {
-        return ;
+    image = ui ("image-input").files [0] ;
+
+    data = {}
+    if (image != null) {
+        data = new FormData () ;
+        data .append ("files", image)
+        data .append ("message", msg)
+
+        data.append ("type", "image")
+        data.append ("sender", to)
+    } else {
+        if (msg == '')
+            return ;
+        data = {
+            "message": msg,
+            "type": "message",
+            "sender": to
+        }
     }
 
-    data = {
-        "message": msg,
-        "type": "message",
-        "sender": to
-    }
+    db ("chat", "insert|notify", data, function (data) {
+        console.log (data)
+        if (data.error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Message not sent.',
+                text: data.error
+              })
 
+        }
+        console.log ("Message sent")
+        chat_message (true, msg)
+        ui ("message").scrollIntoView (true)
+        ui ("message").value = ""
+        chat_remove_attachment () ;
+    },function (data) {
+        console.log (data)
+        Swal.fire({
+            icon: 'error',
+            title: 'Message not sent.',
+            text: data.responseText
+          })
+          
+    });
+
+    /*
     $.ajax({
         type: "POST",
         url: "/anneli/api/db.php?table=chat&action=insert|notify",
@@ -40,6 +76,7 @@ function chat_send_message () {
         },
         dataType: "json"
       });
+      */
     // $.ajax({
     //     type: "POST",
     //     url: "/anneli/api/db.php?action=notify",

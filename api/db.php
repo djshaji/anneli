@@ -9,6 +9,7 @@ chdir ("/var/www/". explode (".",$_SERVER ["HTTP_HOST"])[0]);
 include "config.php";
 include "anneli/db.php";
 include "anneli/token.php";
+include "anneli/script.php";
 
 token_login ();
 if ($uid == null) {
@@ -62,6 +63,11 @@ if ($_GET ["mode"] == "json") {
         );
     }
 } 
+
+if ($_POST ["__script__"]) {
+    $script = $_POST ["__script__"] ;
+    unset ($_POST ["__script__"]);
+}
 
 // var_dump ($data);
 if (strpos ($_GET ["action"], "|") == -1)

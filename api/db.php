@@ -99,6 +99,7 @@ foreach ($actions as $action) {
                 return ;
             // echo ($to) ;
             // var_dump ($data);
+            $xdata ["uid"] = $uid ;
             $messaging = $factory->createMessaging();
             $message = CloudMessage::withTarget('token', $to)
                 ->withNotification($notification)

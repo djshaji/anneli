@@ -21,6 +21,7 @@ function chat_send_message () {
         }
     }
 
+    console.log (data)
     db ("chat", "insert|notify", data, function (data) {
         console.log (data)
         if (data.error) {
@@ -101,7 +102,8 @@ function chat_send_message () {
     //   });
 }
 
-function chat_message (own, message) {
+function chat_message (own, message, file = null, type = null) {
+    console.log ("Appending message", true)
     c = uic ("a")
     if (own) {
         for (i of [
@@ -133,6 +135,14 @@ function chat_message (own, message) {
         ])
             c.classList.add (i)
         c.innerHTML = message + '&nbsp;<sup class="badge text-muted bg-secondary m-1" style="opacity:80%;font-size:60%">' + JSClock () + '</sup>'
+
+        if (file != null && type == "image") {
+            img_element = uic ("img")
+            img_element.setAttribute ("height", "256px");
+            img_element.src = file
+
+            c.prepend (img_element)
+        }
     }
 
     ui ("mcontainer").appendChild (c)
@@ -175,8 +185,23 @@ function chat_init () {
     const messaging = firebase.messaging ();
     messaging.onMessage((payload) => {
         console.log('Message received. ', payload);
-        if(data.sender == to && data.type == 'message')
+        /*  This is apparently reversed here.
+            Sender means whom it is intended for
+        */
+
+        if(payload.data.sender == uid && payload.data.uid == to && payload.data.type == 'message') {
             chat_message (false, payload.notification.body)
+        }
+        else if(payload.data.sender == uid && payload.data.uid == to && payload.data.type == 'image') {
+            if (payload.notification.body == null)
+                payload.notification.body = ""
+            link = null ;
+            files = JSON.parse (payload.data.files)
+            for (i in files)
+                link = files [i]
+            chat_message (false, payload.notification.body, link, "image")
+        }
+
         ui ("message").scrollIntoView ()
         // ...
       });

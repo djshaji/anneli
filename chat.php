@@ -61,7 +61,7 @@ $sender = $auth -> getUser ($to) ;
           <textarea class="form-control" placeholder="Type a message" id="message" style="height: 100px"></textarea>
           <label for="message">Type a message</label>
           <img id="image-attach" class='card position-absolute mt-2 top-0 end-0 d-none' height="80">
-          <i class="fas fa-times-circle position-absolute mt-2 top-0 end-0 text-danger p-1"></i>
+          <button onclick="chat_remove_attachment ()" id="image-remove" class="d-none mdl-js-button mdl-button--icon mdl-button position-absolute mt-2 top-0 end-0 p-1"><i class="fas fa-times-circle text-danger"></i></button>
         </div>        
       </div>
 

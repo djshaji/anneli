@@ -143,6 +143,7 @@ function JSClock() {
 function chat_attach_file (input) {
     console.log (input)
     ui ("image-attach").classList.remove ("d-none")
+    ui ("image-remove").classList.remove ("d-none")
     if (FileReader && input.files && input.files.length) {
         var fr = new FileReader();
         fr.onload = function () {
@@ -151,4 +152,11 @@ function chat_attach_file (input) {
         
         fr.readAsDataURL(input.files[0]);
     }
+}
+
+function chat_remove_attachment () {
+    ui ("image-attach").src = ""
+    ui ("image-attach").classList.add ("d-none")
+    ui ("image-remove").classList.add ("d-none")
+    ui ("image-input").value = ""
 }

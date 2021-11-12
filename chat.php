@@ -117,10 +117,10 @@ $sender = $auth -> getUser ($to) ;
 <div class="modal modal-fullscreen fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <img id="lightbox" style="max-width:100%;max-height:100%">
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
-      </div>
-
+  </div>
+  <div class="mt-2 modal-footer d-flex justify-content-center">
+    <button onclick="window.open(ui ('lightbox').src, '_blank')" type="button" class="btn me-2 btn-success"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
   </div>
 </div>
 <?php

@@ -1,14 +1,30 @@
 <?php
 
-function set_file_permission ($script) {
+function setperm ($array) {
     /*  setperm
         usage: setperm file uid permission
+        the first parameter is the function name
     */
+    $entry = array (
+        "user" => $array [2],
+        "filename" => $array [1],
+        "permission" => "read"
+    );
 
-    $array = explode (" ", $script) ;
-    
+    db_insert ("filepermissions", $entry, false) ;
 }
 
-switch
+$functions = [
+    "setperm"
+] ;
+
+function script_run ($script) {
+    $lines = explode ("\n", $array) ;
+    foreach ($lines as $line) {
+        $cmd = explode (" ", $line) ;
+        if (isset ($functions [$cmd [0]]))
+            $functions [$cmd [0]] ($cmd);
+    }    
+}
 
 ?>

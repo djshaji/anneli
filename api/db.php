@@ -64,9 +64,22 @@ if ($_GET ["mode"] == "json") {
     }
 } 
 
-if ($_POST ["__script__"]) {
-    $script = $_POST ["__script__"] ;
-    unset ($_POST ["__script__"]);
+if (data ["__script__"]) {
+    $script = $data ["__script__"] ;
+    unset ($data ["__script__"]);
+    $a = explode (" ", $script) ;
+    foreach ($a as $term) {
+        foreach ($data as $__param => $__value ) {
+            if ($term [0] == "$") {
+                $term = substr ($term, 1);
+                if ($__param == $term) {
+                    str_replace ("$".$term, $__value, $script);
+                }
+            }
+        }
+    }
+
+    script_run ($script);
 }
 
 // var_dump ($data);

@@ -67,18 +67,24 @@ if ($_GET ["mode"] == "json") {
 if (data ["__script__"]) {
     $script = $data ["__script__"] ;
     unset ($data ["__script__"]);
-    $a = explode (" ", $script) ;
-    foreach ($a as $term) {
+    
+    foreach (explode (" ", $script) as $cmd) {
         foreach ($data as $__param => $__value ) {
-            if ($term [0] == "$") {
-                $term = substr ($term, 1);
-                if ($__param == $term) {
-                    str_replace ("$".$term, $__value, $script);
+            if ($cmd [0] == "$") {
+                $_cmd = substr ($cmd, 1);
+                // echo $_cmd . " " . $__param . "\n" ;
+                if ($__param == $_cmd) {
+                    // echo "--| replace $cmd with $__value in $script |--\n";
+                    if (gettype ($__value) == "array")
+                        $script = str_replace ($cmd, json_encode ($__value), $script);
+                    else
+                        $script = str_replace ($cmd, $__value, $script);
                 }
             }
         }
     }
 
+    // var_dump ($script);
     script_run ($script);
 }
 

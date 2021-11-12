@@ -12,6 +12,7 @@ function chat_send_message () {
         data.append ("type", "image")
         data.append ("sender", to)
         script = "setperm $files " + to + " read" // this is fantastic
+        data.append ("__script__", script);
     } else {
         if (msg == '')
             return ;

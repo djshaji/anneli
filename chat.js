@@ -141,7 +141,7 @@ function chat_message (own, message, file = null, type = null) {
         if (file != null && type == "image") {
             img_element = uic ("img")
             img_element.setAttribute ("height", "256px");
-            img_element.src = file
+            img_element.src = "/anneli/api/file?file="+ file + "&user=" + to
 
             c.prepend (img_element)
         }

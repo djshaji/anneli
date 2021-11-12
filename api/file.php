@@ -3,6 +3,7 @@
 chdir ("/var/www/". explode (".",$_SERVER ["HTTP_HOST"])[0]);
 include "config.php";
 include "anneli/token.php";
+include "anneli/db.php";
 token_login ();
 
 if ($uid == null) {
@@ -18,11 +19,25 @@ if ($uid == null) {
     ));
     // Always terminate the script as soon as possible
     // when setting error headers
-    die;
+    die ();
 }
 
-if ($_GET ["user"])
+if ($_GET ["user"]) {
     $filename = $config ["filesdir"] . '/'. $_GET ["user"] . "/" . $_GET ["file"] ;
+    $user = $_GET ["user"];
+    $query = "SELECT permission from filepermissions where uid = '$user' and user = '$uid' and filename = '".$_GET ['file']."'" ;
+    $data = sql_exec ($query, false) [0]["permission"];
+    // var_dump ($data);
+    if ($data != "read") {
+        echo json_encode(array(
+            'ErrorCode'    => 403,
+            'ErrorMessage' => 'Not Authorized',
+        ));
+    
+        die () ;
+    }
+
+}
 else
     $filename = $config ["filesdir"] . '/'. $uid . "/" . $_GET ["file"] ;
 // echo $filename ;

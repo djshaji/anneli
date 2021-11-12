@@ -55,6 +55,8 @@ $sender = $auth -> getUser ($to) ;
                 $filename = null ;
                 foreach (json_decode ($d ["files"], true) as $df => $fn)
                   $filename = "/anneli/api/file?file=" . $fn ;
+                if ($d ["uid"] != $uid)
+                  $filename .= "&user=" . $d ["uid"];
                 $message = sprintf (
                   "<button onclick='ui (\"lightbox\").src=\"%s\"' class='btn btn-secondary' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop\" data-img='%s'><img src='%s' height='256px'></button> %s",
                   $filename, $filename, $filename, $d ["message"]

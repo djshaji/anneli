@@ -21,7 +21,10 @@ if ($uid == null) {
     die;
 }
 
-$filename = $config ["filesdir"] . '/'. $uid . "/" . $_GET ["file"] ;
+if ($_GET ["user"])
+    $filename = $config ["filesdir"] . '/'. $_GET ["user"] . "/" . $_GET ["file"] ;
+else
+    $filename = $config ["filesdir"] . '/'. $uid . "/" . $_GET ["file"] ;
 // echo $filename ;
 
 // header('X-Sendfile', $filename);

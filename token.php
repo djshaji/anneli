@@ -6,8 +6,8 @@ use Kreait\Firebase\Factory;
 
 $auth = null ;
 function token_verify ($idTokenString, $user = false) {
-    global $auth, $factory ;
-    $factory = (new Factory)->withServiceAccount('../letsgodil-admin/lets-go-dil-firebase-adminsdk-8j1sk-900215dc14.json');
+    global $auth, $factory, $config ;
+    $factory = (new Factory)->withServiceAccount($config ["serviceAccount"]);
     $auth = $factory->createAuth();
     $verifiedIdToken = null; 
     try {

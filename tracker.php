@@ -7,7 +7,8 @@ include "anneli/ui.php" ;
 
 $cols = json_decode (file_get_contents("anneli/assets/json/issue-tracker.json"), true);
 $basename = $_SERVER['REQUEST_URI'] ;
-$data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basename' order by auto_id desc", false);
+// $data = sql_exec ("SELECT * from store where uid = '$uid' and module = '$basename' order by auto_id desc", false);
+$data = sql_exec ("SELECT * from store where module = '$basename' order by auto_id desc", false);
 // var_dump ($cols);
 ?>
 

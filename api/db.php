@@ -15,7 +15,7 @@ token_login ();
 if ($uid == null) {
     die ("
     {
-        code: 0,
+        code: auth/nologin,
         error: 'Unauthorized'
     }
     ");
@@ -49,21 +49,7 @@ foreach ($_FILES as $f => $v) {
       }
 }      
 
-if ($_GET ["mode"] == "json") {
-    if ($_GET ['action'] == "update") unset ($data ["where"]);
-    $data = array (
-        "data"=> json_encode ($data),
-        "module"=> $data ["module"]
-    );    
-
-    if ($_GET ['action'] == "update") {
-        $data = array (
-            "update" => $data,
-            "where" => json_decode ($_POST ['where'], true)
-        );
-    }
-} 
-
+// var_dump ($data ["__script__"]);
 if (data ["__script__"]) {
     $script = $data ["__script__"] ;
     unset ($data ["__script__"]);
@@ -72,7 +58,7 @@ if (data ["__script__"]) {
         foreach ($data as $__param => $__value ) {
             if ($cmd [0] == "$") {
                 $_cmd = substr ($cmd, 1);
-                // echo $_cmd . " " . $__param . "\n" ;
+                echo $_cmd . " " . $__param . "\n" ;
                 if ($__param == $_cmd) {
                     // echo "--| replace $cmd with $__value in $script |--\n";
                     if (gettype ($__value) == "array")
@@ -87,6 +73,22 @@ if (data ["__script__"]) {
     // var_dump ($script);
     script_run ($script);
 }
+
+if ($_GET ["mode"] == "json") {
+    if ($_GET ['action'] == "update") unset ($data ["where"]);
+    $data = array (
+        "data"=> json_encode ($data),
+        "module"=> $data ["module"]
+        // "__script__"=> $data ["__script__"]
+    );    
+
+    if ($_GET ['action'] == "update") {
+        $data = array (
+            "update" => $data,
+            "where" => json_decode ($_POST ['where'], true)
+        );
+    }
+} 
 
 // var_dump ($data);
 if (strpos ($_GET ["action"], "|") == -1)

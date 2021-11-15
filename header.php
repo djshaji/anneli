@@ -127,7 +127,11 @@ if (!isset ($_GET ['quiet'])) {
 <link type="text/css" rel="stylesheet" href="anneli/assets/css/all.min.css">
 <link type="text/css" rel="stylesheet" href="anneli/assets/css/style.css">
 <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-<script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
+<?php if (file_exists ($config ["dir"] . "/" . "firebaseConfig.js")) { ?>
+  <script src="/firebaseConfig.js?<?php echo time () ;?>"></script>
+<?php } else { ?>
+  <script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
+<?php } ?>
 <script src="anneli/util.js?<?php echo time () ;?>"></script>
 <script src="anneli/colors.js?"></script>
 <script src="anneli/fonts.js?"></script>

@@ -479,13 +479,17 @@ function db (table, action, data, success_func, error_func, mode = "db") {
 }
 
 function form_to_json (id, data_prefix = null) {
+  console.log (id)
   form = ui (id) ;
   data = new FormData ();
   data_json = {}
   
 
   for (element_ of ["input", "select"]) {
-    for (i of form.querySelectorAll (element_)) {
+    querySelector = form.querySelectorAll (element_) ;
+    if (querySelector == null)
+      continue;
+    for (i of querySelector) {
       if (i.type == "file")
         for (x of i.files)
           data.append (i.id, x)
@@ -565,9 +569,10 @@ function load_form (dialog, element) {
   ui(dialog).setAttribute ("auto_id", element.id)
 }
 
-function submit_form (dialog, database, mode =  "json") {
+function submit_form (dialog, database, mode =  "json", script= null) {
   console.log (dialog)
   form = ui (dialog + "-form")
+  /*
   for (element_ of ["input", "select"]) {
     for (i of form.querySelectorAll (element_)) {
       if (i.value == "") {
@@ -583,9 +588,11 @@ function submit_form (dialog, database, mode =  "json") {
       }
     }
   }
+  */
 
   formdata = form_to_json (dialog + "-form") ;
   formdata.append ("module", location.pathname)
+  if (script) formdata.append ("__script__", script)
   db (database, "insert", formdata, function () {
     Swal.fire(
       'Data saved',
@@ -596,16 +603,17 @@ function submit_form (dialog, database, mode =  "json") {
     })
     
     $(dialog).modal ("hide") ;
-  }, function () {
+  }, function (data) {
     Swal.fire(
       'Data not saved',
-      'Your information could not be saved successfully',
+      'Your information could not be saved successfully:\n' + data.responseText,
       'error'
-    )
+    ) ;
+    console.error (data)
   }, mode)
 }
 
-function update_form (dialog, database, mode = "json") {
+function update_form (dialog, database, mode = "json", script = null) {
   form = ui (dialog + "-form")
 
   formdata = form_to_json (dialog + "-form") ;
@@ -615,7 +623,7 @@ function update_form (dialog, database, mode = "json") {
   } ;
 
   formdata.append ("where", JSON.stringify (where))
-
+  if (script) formdata.append ("__script__", script)
   // update_data = {
   //   "update": formdata,
   //   "where": {

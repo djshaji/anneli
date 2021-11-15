@@ -58,8 +58,9 @@ function ui_table ($data, $cols, $title, $database) {
   ) ;
 }
 
-function ui_table_dialog ($cols, $title, $database) {
+function ui_table_dialog ($cols, $title, $database, $fab = false, $json = "json", $script = null, $dialog = true) {
   $id = str_replace (" ", "-", $title);
+  if (! $fab && $dialog) {
   ?>
     <div class="row">
       <button onclick="form_reset ('<?php echo $id;?>')" class="shadow btn btn-lg btn-primary mx-auto col-md-2 m-2" data-bs-toggle="modal" data-bs-target="#<?php echo $id;?>">
@@ -68,9 +69,17 @@ function ui_table_dialog ($cols, $title, $database) {
       </button>
     </div>  
   <?php
+  } else if ($dialog) { ?>
+    <div class="row">
+      <button onclick="form_reset ('<?php echo $id;?>')" class="shadow position-absolute bottom-0 end-0 mdl-button mdl-button--fab bg-primary text-white m-4" data-bs-toggle="modal" data-bs-target="#<?php echo $id;?>">
+        <i class="material-icons">add</i>
+      </button>
+    </div>  
+  <?php
+  }
   ?>
   <!-- Modal -->
-  <div class="modal fade" id="<?php echo $id;?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="<?php if ($dialog) echo 'modal fade';?>" id="<?php echo $id;?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -117,13 +126,59 @@ function ui_table_dialog ($cols, $title, $database) {
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
-          <button onclick="submit_form ('<?php echo $title ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
-          <button onclick="update_form ('<?php echo $title ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
+          <?php if ($dialog) {?>}
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
+          <?php } ?>
+          <button onclick="submit_form ('<?php echo $id ;?>', '<?php echo $database ;?>' <?php if ($json) echo ", '$json'"; if ($script) echo ", '$script'" ;?>)" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
+          <button onclick="update_form ('<?php echo $id ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
         </div>
       </div>
     </div>
   </div>
   <?php
+}
+
+function fab ($id, $links) {
+  printf ('
+    <div class="btn-group dropup position-absolute bottom-0 end-0">
+      <button id="%s" data-bs-toggle="dropdown" class="m-4 dropdown-toggle text-white shadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect bg-primary">
+        <i class="material-icons">add</i>
+      </button>
+      ', $id
+    );
+
+    foreach ($links as $label => $link) {
+      printf ('
+        <ul class="fade shadow m-2 dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" type="button" href="%s">%s</a></li>
+        </ul>
+      </div>
+      ', $link, $label) ;
+    }
+}
+
+function ui_cards ($data, $title, $text, $image) {
+    echo '<div class="row row-cols-1 row-cols-md-2 g-4">';
+
+    foreach ($data as $_d) { 
+      $d = json_decode ($_d ["data"], true) ;
+      $_image = null ;
+      foreach ($d [$image] as $im => $_im) {
+        $_image = "/anneli/api/file?file=$_im&user=".$_d ["uid"];
+      }
+      // var_dump ($_image);
+      ?>
+      <div class="col">
+        <div class="card">
+          <img src="<?php echo $_image ;?>" class="card-img-top">
+          <div class="card-body">
+            <h5 class="card-title"><?php echo $d [$title] ;?></h5>
+            <p class="card-text"><?php echo $d [$text] ;?></p>
+          </div>
+        </div>
+      </div>
+      <?php
+    }
+    echo '</div>';
 }
 ?>

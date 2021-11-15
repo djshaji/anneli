@@ -61,5 +61,12 @@ foreach ($data as $d) {
 <?php }?>
 
 <?php
+if ($config ["messages"]["new"]) {
+  require_once ("anneli/ui.php");
+  fab ("fab", array (
+    "Shaji" => "/anneli/chat?to=1JNCG5gqK6d01ZdTUIcFiiNpiDC2"
+  ));
+}
+
 include "anneli/footer.php" ;
 ?>

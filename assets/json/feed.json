@@ -1,0 +1,12 @@
+{
+    "Title": {
+        "type": "text",
+        "class": "col-12"
+    },
+    "Description": {
+        "type": "textarea"
+    },
+    "Images": {
+        "type": "file"
+    }
+}

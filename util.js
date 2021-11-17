@@ -599,7 +599,7 @@ function submit_form (dialog, database, mode =  "json", script= null) {
       'Your information was saved successfully',
       'success'
     ).then (function () {
-      location.reload () ;
+      // location.reload () ;
     })
     
     $(dialog).modal ("hide") ;
@@ -642,10 +642,11 @@ function update_form (dialog, database, mode = "json", script = null) {
 
     $(dialog).modal ("hide") ;
     // location.reload () ;
-  }, function () {
+  }, function (data) {
+    console.error (data)
     Swal.fire(
       'Data not saved',
-      'Your information could not be saved successfully',
+      'Your information could not be saved successfully\n' + data.responseText,
       'error'
     )
   }, mode)

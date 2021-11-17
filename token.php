@@ -5,6 +5,7 @@ use Firebase\Auth\Token\Exception\InvalidToken;
 use Kreait\Firebase\Factory;
 
 $auth = null ;
+//var_dump ($config ["serviceAccount"]);
 function token_verify ($idTokenString, $user = false) {
     global $auth, $factory, $config ;
     $factory = (new Factory)->withServiceAccount($config ["serviceAccount"]);
@@ -13,7 +14,8 @@ function token_verify ($idTokenString, $user = false) {
     try {
         $verifiedIdToken = $auth->verifyIdToken($idTokenString);
     } catch (InvalidArgumentException $e) {
-        // echo 'The token could not be parsed: '.$e->getMessage();
+        if ($verifiedIdToken == null)
+            echo '<script>console.log ("The token could not be parsed: '.$e->getMessage() . '")</script>';
         ?>
         <?php
     } catch (InvalidToken $e) {
@@ -36,7 +38,8 @@ function token_verify ($idTokenString, $user = false) {
 // var_dump (token_verify ($argv [1]));
 
 function token_get_user ($uid) {
-    $factory = (new Factory)->withServiceAccount('../plasma-admin/codename-plasma-firebase-adminsdk-89ymr-2cfabe5526.json');
+    global $config ;
+    $factory = (new Factory)->withServiceAccount($config ["serviceAccount"]);
     $auth = $factory->createAuth();
     $user = $auth->getUser($uid);
     return $user ;

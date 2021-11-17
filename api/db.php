@@ -54,11 +54,11 @@ if (data ["__script__"]) {
     $script = $data ["__script__"] ;
     unset ($data ["__script__"]);
     
-    foreach (explode (" ", $script) as $cmd) {
+    foreach (explode ("|", $script) as $cmd) {
         foreach ($data as $__param => $__value ) {
             if ($cmd [0] == "$") {
                 $_cmd = substr ($cmd, 1);
-                echo $_cmd . " " . $__param . "\n" ;
+                // echo $_cmd . " " . $__param . "\n" ;
                 if ($__param == $_cmd) {
                     // echo "--| replace $cmd with $__value in $script |--\n";
                     if (gettype ($__value) == "array")
@@ -75,14 +75,14 @@ if (data ["__script__"]) {
 }
 
 if ($_GET ["mode"] == "json") {
-    if ($_GET ['action'] == "update") unset ($data ["where"]);
+    if ($_GET ['action'] == "update" || $_GET ['action'] == "updatei" ) unset ($data ["where"]);
     $data = array (
         "data"=> json_encode ($data),
         "module"=> $data ["module"]
         // "__script__"=> $data ["__script__"]
     );    
 
-    if ($_GET ['action'] == "update") {
+    if ($_GET ['action'] == "update"||$_GET ['action'] == "updatei" ) {
         $data = array (
             "update" => $data,
             "where" => json_decode ($_POST ['where'], true)
@@ -156,7 +156,7 @@ foreach ($actions as $action) {
             
             $data ["update"]['stamp'] = time ();
             $data ["where"]['uid'] = $uid ;
-            
+            // var_dump ($data);
             // db_update ($_GET ['table'], $data ['update'], $data ['where'], false);
             db_update_multi ($_GET ['table'], $data ['update'], $data ['where'], false);
             echo json_encode ("{code: 1}");
@@ -168,6 +168,7 @@ foreach ($actions as $action) {
             $data ["update"]['stamp'] = time ();
             $data ["where"]['uid'] = $uid ;
             
+            // var_dump ($data);
             db_update_or_insert ($_GET ['table'], $data ["update"], $data ["where"], false);
             echo json_encode ("{code: 1}");
             break ;

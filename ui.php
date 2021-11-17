@@ -90,16 +90,17 @@ function ui_table_dialog ($cols, $title, $database, $fab = false, $json = "json"
           <form method="post"  enctype="multipart/form-data" id="<?php echo $id;?>-form" class="row p-3 input-group">
             <?php
               foreach ($cols as $element => $parameters) {
+                $id_element = str_replace (" ", "_", $element);
                 $class = $parameters ["class"] ;
                 $style = "";
-                $fname = $element ;
+                $fname = $id_element ;
                 if ($class = null) $class = "col-md-6";
 
                 switch ($parameters ["type"]) {
                   default:
                     break ;
                   case "select":
-                    echo "<select id='$element' name='$element' class='form-select $class' required>" ;
+                    echo "<select id='$id' name='$id' class='form-select $class' required>" ;
                     echo "<option value=''>$element</option>";
                     foreach ($parameters ["options"] as $o => $_o) {
                       echo "<option value='$o'>$_o</option>";
@@ -117,7 +118,7 @@ function ui_table_dialog ($cols, $title, $database, $fab = false, $json = "json"
                       '<div class="form-floating mb-3 %s">
                         <input multiple name="%s" onchange="this.classList.remove (\'is-invalid\');" required style="%s" type="%s" class="form-control" id="%s" placeholder="%s">
                         <label for="floatingInput">%s</label>
-                      </div>', $class, $fname, $style, $parameters ["type"], $element, $element, $element
+                      </div>', $class, $fname, $style, $parameters ["type"], $id_element, $element, $element
                     ) ;
                     break ;
                 }
@@ -126,11 +127,11 @@ function ui_table_dialog ($cols, $title, $database, $fab = false, $json = "json"
           </form>
         </div>
         <div class="modal-footer">
-          <?php if ($dialog) {?>}
+          <?php if ($dialog) {?>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i>&nbsp;&nbsp;Close</button>
           <?php } ?>
-          <button onclick="submit_form ('<?php echo $id ;?>', '<?php echo $database ;?>' <?php if ($json) echo ", '$json'"; if ($script) echo ", '$script'" ;?>)" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
-          <button onclick="update_form ('<?php echo $id ;?>', '<?php echo $database ;?>')" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
+          <button onclick="submit_form ('<?php echo $id ;?>', '<?php echo $database ;?>' <?php if ($json) echo ", '$json'"; else echo ', json'; if ($script) echo ", '$script'" ;else echo ', null'?>)" id="<?php echo $id;?>-submit" type="button" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
+          <button onclick="update_form ('<?php echo $id ;?>', '<?php echo $database ;?>' <?php if ($json) echo ", '$json'"; else echo ', json'; if ($script) echo ", '$script'" ; else echo ', null';?>)" id="<?php echo $id;?>-update" type="button" class="d-none btn btn-warning"><i class="fas fa-sync"></i>&nbsp;&nbsp;Update</button>
         </div>
       </div>
     </div>
@@ -158,7 +159,7 @@ function fab ($id, $links) {
 }
 
 function ui_cards ($data, $title, $text, $image) {
-    echo '<div class="row row-cols-1 row-cols-md-2 g-4">';
+    echo '<div class="row justify-content-center">';
 
     foreach ($data as $_d) { 
       $d = json_decode ($_d ["data"], true) ;
@@ -168,7 +169,7 @@ function ui_cards ($data, $title, $text, $image) {
       }
       // var_dump ($_image);
       ?>
-      <div class="col">
+      <div class="col-md-5 m-3">
         <div class="card">
           <img src="<?php echo $_image ;?>" class="card-img-top">
           <div class="card-body">

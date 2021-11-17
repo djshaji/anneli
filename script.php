@@ -2,11 +2,11 @@
 
 function setperm ($array) {
     /*  setperm
-        usage: setperm file uid permission type
+        usage: setperm|file|uid|permission|type
         the first parameter is the function name
     */
     // echo "DD";
-    // var_dump ($array [1]);
+    var_dump ($array [1]);
     foreach (json_decode ($array [1], true) as $file => $filename) {
         $entry = array (
             "user" => $array [2],
@@ -36,7 +36,7 @@ function script_run ($script) {
     global $functions ;
     $lines = explode ("\n", $script) ;
     foreach ($lines as $line) {
-        $cmd = explode (" ", $line) ;
+        $cmd = explode ("|", $line) ;
         // var_dump ($functions);
         // echo $cmd [0] . "\n";
         // var_dump (in_array ($cmd [0], $functions));

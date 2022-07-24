@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Database;
 
+use Beste\Json;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Exception\DatabaseApiExceptionConverter;
 use Kreait\Firebase\Exception\DatabaseException;
-use Kreait\Firebase\Http\WrappedGuzzleClient;
-use Kreait\Firebase\Util\JSON;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Throwable;
@@ -17,16 +16,11 @@ use Throwable;
 /**
  * @internal
  */
-class ApiClient implements ClientInterface
+class ApiClient
 {
-    use WrappedGuzzleClient;
+    private ClientInterface $client;
+    protected DatabaseApiExceptionConverter $errorHandler;
 
-    /** @var DatabaseApiExceptionConverter */
-    protected $errorHandler;
-
-    /**
-     * @internal
-     */
     public function __construct(ClientInterface $httpClient)
     {
         $this->client = $httpClient;
@@ -44,12 +38,10 @@ class ApiClient implements ClientInterface
     {
         $response = $this->requestApi('GET', $uri);
 
-        return JSON::decode((string) $response->getBody(), true);
+        return Json::decode((string) $response->getBody(), true);
     }
 
     /**
-     * @internal This method should only be used in the context of Database translations
-     *
      * @param UriInterface|string $uri
      *
      * @throws DatabaseException
@@ -64,7 +56,7 @@ class ApiClient implements ClientInterface
             ],
         ]);
 
-        $value = JSON::decode((string) $response->getBody(), true);
+        $value = Json::decode((string) $response->getBody(), true);
         $etag = $response->getHeaderLine('ETag');
 
         return [
@@ -85,12 +77,10 @@ class ApiClient implements ClientInterface
     {
         $response = $this->requestApi('PUT', $uri, ['json' => $value]);
 
-        return JSON::decode((string) $response->getBody(), true);
+        return Json::decode((string) $response->getBody(), true);
     }
 
     /**
-     * @internal This method should only be used in the context of Database translations
-     *
      * @param UriInterface|string $uri
      * @param mixed $value
      *
@@ -107,12 +97,10 @@ class ApiClient implements ClientInterface
             'json' => $value,
         ]);
 
-        return JSON::decode((string) $response->getBody(), true);
+        return Json::decode((string) $response->getBody(), true);
     }
 
     /**
-     * @internal This method should only be used in the context of Database translations
-     *
      * @param UriInterface|string $uri
      *
      * @throws DatabaseException
@@ -135,11 +123,14 @@ class ApiClient implements ClientInterface
      */
     public function updateRules($uri, RuleSet $ruleSet)
     {
+        $rules = $ruleSet->getRules();
+        $encodedRules = Json::encode((object) $rules);
+
         $response = $this->requestApi('PUT', $uri, [
-            'body' => \json_encode($ruleSet, \JSON_PRETTY_PRINT),
+            'body' => $encodedRules,
         ]);
 
-        return JSON::decode((string) $response->getBody(), true);
+        return Json::decode((string) $response->getBody(), true);
     }
 
     /**
@@ -152,7 +143,7 @@ class ApiClient implements ClientInterface
     {
         $response = $this->requestApi('POST', $uri, ['json' => $value]);
 
-        return JSON::decode((string) $response->getBody(), true)['name'];
+        return Json::decode((string) $response->getBody(), true)['name'];
     }
 
     /**
@@ -184,12 +175,12 @@ class ApiClient implements ClientInterface
      */
     private function requestApi(string $method, $uri, ?array $options = null): ResponseInterface
     {
-        $options = $options ?? [];
+        $options ??= [];
 
         $request = new Request($method, $uri);
 
         try {
-            return $this->send($request, $options);
+            return $this->client->send($request, $options);
         } catch (Throwable $e) {
             throw $this->errorHandler->convertException($e);
         }

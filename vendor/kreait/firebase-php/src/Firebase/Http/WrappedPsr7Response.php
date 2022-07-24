@@ -8,12 +8,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**
+ * @internal
  * @codeCoverageIgnore
  */
 trait WrappedPsr7Response
 {
-    /** @var ResponseInterface */
-    protected $wrappedResponse;
+    protected ResponseInterface $wrappedResponse;
 
     public function getProtocolVersion(): string
     {

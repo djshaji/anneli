@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Request;
 
+use Beste\Json;
 use Kreait\Firebase\Exception\InvalidArgumentException;
 use Kreait\Firebase\Request;
-use Kreait\Firebase\Util\JSON;
-use Kreait\Firebase\Value\Provider;
 
 final class UpdateUser implements Request
 {
+    /** @phpstan-use EditUserTrait<self> */
     use EditUserTrait;
 
     public const DISPLAY_NAME = 'DISPLAY_NAME';
@@ -18,13 +18,13 @@ final class UpdateUser implements Request
     public const EMAIL = 'EMAIL';
 
     /** @var array<string> */
-    private $attributesToDelete = [];
+    private array $attributesToDelete = [];
 
-    /** @var Provider[] */
-    private $providersToDelete = [];
+    /** @var string[] */
+    private array $providersToDelete = [];
 
     /** @var array<string, mixed>|null */
-    private $customAttributes;
+    private ?array $customAttributes = null;
 
     private function __construct()
     {
@@ -51,56 +51,68 @@ final class UpdateUser implements Request
                 case 'removephoto':
                 case 'removephotourl':
                     $request = $request->withRemovedPhotoUrl();
+
                     break;
                 case 'deletedisplayname':
                 case 'removedisplayname':
                     $request = $request->withRemovedDisplayName();
+
                     break;
                 case 'deleteemail':
                 case 'removeemail':
                     $request = $request->withRemovedEmail();
-                    break;
 
+                    break;
                 case 'deleteattribute':
                 case 'deleteattributes':
                     foreach ((array) $value as $deleteAttribute) {
                         switch (\mb_strtolower(\preg_replace('/[^a-z]/i', '', $deleteAttribute))) {
                             case 'displayname':
                                 $request = $request->withRemovedDisplayName();
+
                                 break;
                             case 'photo':
                             case 'photourl':
                                 $request = $request->withRemovedPhotoUrl();
+
                                 break;
                             case 'email':
                                 $request = $request->withRemovedEmail();
+
                                 break;
                         }
                     }
+
                     break;
                 case 'customattributes':
                 case 'customclaims':
                     $request = $request->withCustomAttributes($value);
+
                     break;
                 case 'phonenumber':
                 case 'phone':
                     if (!$value) {
                         $request = $request->withRemovedPhoneNumber();
                     }
+
                     break;
                 case 'deletephone':
                 case 'deletephonenumber':
                 case 'removephone':
                 case 'removephonenumber':
                     $request = $request->withRemovedPhoneNumber();
+
                     break;
                 case 'deleteprovider':
                 case 'deleteproviders':
                 case 'removeprovider':
                 case 'removeproviders':
-                    $request = \array_reduce((array) $value, static function (self $request, $provider) {
-                        return $request->withRemovedProvider($provider);
-                    }, $request);
+                    $request = \array_reduce(
+                        (array) $value,
+                        static fn (self $request, $provider) => $request->withRemovedProvider($provider),
+                        $request
+                    );
+
                     break;
             }
         }
@@ -117,14 +129,12 @@ final class UpdateUser implements Request
     }
 
     /**
-     * @param Provider|string $provider
+     * @param \Stringable|string $provider
      */
     public function withRemovedProvider($provider): self
     {
-        $provider = $provider instanceof Provider ? $provider : new Provider($provider);
-
         $request = clone $this;
-        $request->providersToDelete[] = $provider;
+        $request->providersToDelete[] = (string) $provider;
 
         return $request;
     }
@@ -179,11 +189,7 @@ final class UpdateUser implements Request
         $data = $this->prepareJsonSerialize();
 
         if (\is_array($this->customAttributes)) {
-            if (empty($this->customAttributes)) {
-                $data['customAttributes'] = '{}';
-            } else {
-                $data['customAttributes'] = JSON::encode($this->customAttributes);
-            }
+            $data['customAttributes'] = empty($this->customAttributes) ? '{}' : Json::encode($this->customAttributes);
         }
 
         if (!empty($this->attributesToDelete)) {

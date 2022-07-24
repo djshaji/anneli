@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\DynamicLink;
 
-use Kreait\Firebase\Util\JSON;
+use Beste\Json;
 use Psr\Http\Message\ResponseInterface;
 
 final class DynamicLinkStatistics
 {
     /** @var array<string, array<int, array<string, string>>> */
-    private $rawData;
-
-    /** @var EventStatistics */
-    private $events;
+    private array $rawData = [];
+    private EventStatistics $events;
 
     private function __construct()
     {
+        $this->events = EventStatistics::fromArray([]);
     }
 
     /**
@@ -24,7 +23,7 @@ final class DynamicLinkStatistics
      */
     public static function fromApiResponse(ResponseInterface $response): self
     {
-        $data = JSON::decode((string) $response->getBody(), true);
+        $data = Json::decode((string) $response->getBody(), true);
 
         $link = new self();
         $link->rawData = $data;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Auth;
 
-use Firebase\Auth\Token\Domain\Generator;
+use Beste\Json;
 use GuzzleHttp\ClientInterface;
 use InvalidArgumentException;
 use Kreait\Firebase\Exception\Auth\AuthError;
@@ -12,27 +12,24 @@ use Kreait\Firebase\Exception\AuthApiExceptionConverter;
 use Kreait\Firebase\Exception\AuthException;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Util\DT;
-use Kreait\Firebase\Util\JSON;
-use Kreait\Firebase\Value\Uid;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token;
 use Throwable;
 
-class CustomTokenViaGoogleIam implements Generator
+/**
+ * @internal
+ */
+final class CustomTokenViaGoogleIam
 {
-    /** @var string */
-    private $clientEmail;
+    private string $clientEmail;
 
-    /** @var ClientInterface */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var Configuration */
-    private $config;
+    private Configuration $config;
 
-    /** @var TenantId|null */
-    private $tenantId;
+    private ?string $tenantId;
 
-    public function __construct(string $clientEmail, ClientInterface $client, ?TenantId $tenantId = null)
+    public function __construct(string $clientEmail, ClientInterface $client, ?string $tenantId = null)
     {
         $this->clientEmail = $clientEmail;
         $this->client = $client;
@@ -42,7 +39,7 @@ class CustomTokenViaGoogleIam implements Generator
     }
 
     /**
-     * @param Uid|string$uid
+     * @param \Stringable|string$uid
      * @param array<string, mixed> $claims
      *
      * @throws AuthException
@@ -61,10 +58,11 @@ class CustomTokenViaGoogleIam implements Generator
             ->permittedFor('https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit')
             ->relatedTo($this->clientEmail)
             ->issuedAt($now)
-            ->expiresAt($expiresAt);
+            ->expiresAt($expiresAt)
+        ;
 
-        if ($this->tenantId) {
-            $builder->withClaim('tenantId', $this->tenantId->toString());
+        if ($this->tenantId !== null) {
+            $builder->withClaim('tenantId', $this->tenantId);
         }
 
         if (!empty($claims)) {
@@ -85,7 +83,7 @@ class CustomTokenViaGoogleIam implements Generator
             throw (new AuthApiExceptionConverter())->convertException($e);
         }
 
-        $result = JSON::decode((string) $response->getBody(), true);
+        $result = Json::decode((string) $response->getBody(), true);
 
         if ($base64EncodedSignature = $result['signature'] ?? null) {
             try {

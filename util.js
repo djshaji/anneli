@@ -171,7 +171,8 @@ function init () {
       fireuser = user
       console.log (user)
       // console.log (analytics)
-      firebase.analytics().logEvent ("[load] " + user.email + ": " + location.href)
+      if (analyticsEnabled)
+        firebase.analytics().logEvent ("[load] " + user.email + ": " + location.href)
       // User is signed in.
       try {
         document.getElementById ("menu-login").classList.add ('d-none')
@@ -211,9 +212,11 @@ function init () {
         // document.cookie ['token'] = token.token
         // document.cookie ['uid'] = user.uid
       })
-
-      const analytics = firebase.analytics();
-      firebase.analytics().logEvent('login: ' + fireuser.email + ' @ ' + location.pathname);
+      analytics  = null ;;
+      if (analyticsEnabled) {
+         analytics = firebase.analytics();
+        firebase.analytics().logEvent('login: ' + fireuser.email + ' @ ' + location.pathname);
+      }
             
     } else {
       // No user is signed in.
@@ -456,7 +459,7 @@ function db (table, action, data, success_func, error_func, mode = "db") {
           success_func (data)
     },
     error: function (data) {
-        // console.log (data)
+        console.log (data)
         Swal.fire({
             icon: 'error',
             title: 'Message not sent.',

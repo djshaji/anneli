@@ -1,9 +1,8 @@
 {
     "require": {
-        "kreait/firebase-tokens": "^1.11",
-        "kreait/firebase-php": "^5.16",
         "uxweb/sweet-alert": "^2.0",
         "paquettg/php-html-parser": "^3.1",
-        "lcobucci/jwt": "3.4.1"
+        "lcobucci/jwt": "4.1.5",
+        "kreait/firebase-php": "^6.6"
     }
 }

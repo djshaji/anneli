@@ -11,6 +11,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
+ * @internal
+ *
  * This is basically a Multipart Request, except that in the parts the sub request start lines
  * are injected between the headers and the body.
  *
@@ -25,23 +27,19 @@ final class RequestWithSubRequests implements HasSubRequests, RequestInterface
 {
     use WrappedPsr7Request;
 
-    /** @var string */
-    private $method = 'POST';
+    private string $method = 'POST';
 
-    /** @var string */
-    private $boundary;
+    private string $boundary;
 
-    /** @var AppendStream */
-    private $body;
+    private AppendStream $body;
 
-    /** @var Requests */
-    private $subRequests;
+    private Requests $subRequests;
 
     /**
      * @param string|UriInterface $uri
      * @param string $version Protocol version
      */
-    public function __construct($uri, Requests $subRequests, $version = '1.1')
+    public function __construct($uri, Requests $subRequests, string $version = '1.1')
     {
         $this->boundary = \sha1(\uniqid('', true));
 

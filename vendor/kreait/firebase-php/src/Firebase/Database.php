@@ -12,19 +12,15 @@ use Kreait\Firebase\Database\Transaction;
 use Kreait\Firebase\Exception\InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
-class Database implements Contract\Database
+/**
+ * @internal
+ */
+final class Database implements Contract\Database
 {
-    public const SERVER_TIMESTAMP = ['.sv' => 'timestamp'];
+    private ApiClient $client;
 
-    /** @var ApiClient */
-    private $client;
+    private UriInterface $uri;
 
-    /** @var UriInterface */
-    private $uri;
-
-    /**
-     * @internal
-     */
     public function __construct(UriInterface $uri, ApiClient $client)
     {
         $this->uri = $uri;
@@ -36,6 +32,8 @@ class Database implements Contract\Database
         if ($path === null || \trim($path) === '') {
             $path = '/';
         }
+
+        $path = '/'.\ltrim($path, '/');
 
         try {
             return new Reference($this->uri->withPath($path), $this->client);
@@ -51,7 +49,8 @@ class Database implements Contract\Database
         if (($givenHost = $uri->getHost()) !== ($dbHost = $this->uri->getHost())) {
             throw new InvalidArgumentException(\sprintf(
                 'The given URI\'s host "%s" is not covered by the database for the host "%s".',
-                $givenHost, $dbHost
+                $givenHost,
+                $dbHost
             ));
         }
 
@@ -60,14 +59,14 @@ class Database implements Contract\Database
 
     public function getRuleSet(): RuleSet
     {
-        $rules = $this->client->get($this->uri->withPath('.settings/rules'));
+        $rules = $this->client->get($this->uri->withPath('/.settings/rules'));
 
         return RuleSet::fromArray($rules);
     }
 
     public function updateRules(RuleSet $ruleSet): void
     {
-        $this->client->updateRules($this->uri->withPath('.settings/rules'), $ruleSet);
+        $this->client->updateRules($this->uri->withPath('/.settings/rules'), $ruleSet);
     }
 
     public function runTransaction(callable $callable)

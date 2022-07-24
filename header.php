@@ -1,4 +1,8 @@
 <?php
+if ($config ["analytics"] == false) {
+  echo "<script>const analyticsEnabled = false;</script>";
+}
+
 $root = [
   "2wdKBu0eqCXATgjS7ilpwEPYj3J3"
 ];
@@ -110,11 +114,17 @@ if (!isset ($_GET ['quiet'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
+<?php if (file_exists (getcwd () . "/favicon.png")) {?>
+<link rel="shortcut icon" type="image/jpg" href="/favicon.png"/>
+<?php } else { ?>
 <link rel="shortcut icon" type="image/jpg" href="anneli/assets/img/favicon.png"/>
-
+<?php } ?>
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <!-- <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-red.min.css" /> -->
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+<!-- New Material Symbols, yay! -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 <!-- <link type="text/css" rel="stylesheet" href="assets/css/bootstrap.css"> -->
 <?php if (! isset ($_GET ['print'])) {?>
@@ -130,6 +140,8 @@ if (!isset ($_GET ['quiet'])) {
 <?php if (file_exists ($config ["dir"] . "/" . "firebaseConfig.js")) { ?>
   <script src="/firebaseConfig.js?<?php echo time () ;?>"></script>
 <?php } else { ?>
+  ?><?php echo "<script>fconfig = '".$config ["dir"] . "/" . "firebaseConfig.js'</script>";?>
+  <script>console.warn ("using default firebase config js | not found:", fconfig)</script>
   <script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
 <?php } ?>
 <script src="anneli/util.js?<?php echo time () ;?>"></script>
@@ -140,7 +152,7 @@ if (!isset ($_GET ['quiet'])) {
 <head>
   <meta charset="utf-8" />
   <link rel="apple-touch-icon" sizes="76x76" href="./anneli/assets/img/apple-icon.png">
-  <link rel="icon" type="image/png" href="./anneli/assets/img/favicon.png">
+  <!-- <link rel="icon" type="image/png" href="./anneli/assets/img/favicon.png"> -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title>
     <?php echo $codename ;?>
@@ -158,7 +170,7 @@ if (!isset ($_GET ['quiet'])) {
   <!-- Navbar -->
   <div class="mdl-layout mdl-js-layout">
   
-  <div class="navbar navbar-expand-lg navbar-dark bg-<?php echo $config ['header-bg'] .' ' ; if ($config ['header'] == false) echo 'd-none' ;?>">
+  <div id="header-navbar" class="navbar navbar-expand-lg navbar-dark bg-<?php echo $config ['header-bg'] .' ' ; if ($config ['header'] == false) echo 'd-none' ;?>">
     <div class="container">
       <div class="d-md-none ms-3"></div>
       <a href="../" class="navbar-brand">
@@ -189,7 +201,11 @@ if (!isset ($_GET ['quiet'])) {
             
             <li class="nav-item d-none dropdown" id="menu-account">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="mr-1 fas fa-user-circle"></i>
+                <?php if ($user && $user ->get ("picture")) {?>
+                  <img width="24" class="p-1" src="<?php echo $user ->get ("picture") ;?>"/>
+                <?php }else {?>
+                  <i class="mr-1 fas fa-user-circle"></i>
+                <?php }?>
                 <span id="email"></span>
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">

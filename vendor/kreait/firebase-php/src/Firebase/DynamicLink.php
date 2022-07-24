@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase;
 
+use Beste\Json;
 use GuzzleHttp\Psr7\Utils;
 use JsonSerializable;
-use Kreait\Firebase\Util\JSON;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
 final class DynamicLink implements JsonSerializable
 {
     /** @var array<string, mixed> */
-    private $data = [];
+    private array $data = [];
 
     private function __construct()
     {
@@ -25,7 +25,7 @@ final class DynamicLink implements JsonSerializable
     public static function fromApiResponse(ResponseInterface $response): self
     {
         $link = new self();
-        $link->data = JSON::decode((string) $response->getBody(), true);
+        $link->data = Json::decode((string) $response->getBody(), true);
 
         return $link;
     }

@@ -11,12 +11,14 @@ use Riverline\MultiPartParser\Converters\PSR7;
 use Riverline\MultiPartParser\StreamedPart;
 use Throwable;
 
+/**
+ * @internal
+ */
 final class ResponseWithSubResponses implements HasSubResponses, ResponseInterface
 {
     use WrappedPsr7Response;
 
-    /** @var Responses */
-    private $subResponses;
+    private Responses $subResponses;
 
     public function __construct(ResponseInterface $response)
     {

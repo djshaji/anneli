@@ -5,19 +5,13 @@ declare(strict_types=1);
 namespace Kreait\Firebase\RemoteConfig;
 
 use GuzzleHttp\Psr7\Uri;
-use Kreait\Firebase\Value\Email;
 use Psr\Http\Message\UriInterface;
 
 final class User
 {
-    /** @var string|null */
-    private $name;
-
-    /** @var Email|null */
-    private $email;
-
-    /** @var UriInterface|null */
-    private $imageUri;
+    private ?string $name = null;
+    private ?string $email = null;
+    private ?UriInterface $imageUri = null;
 
     private function __construct()
     {
@@ -32,7 +26,7 @@ final class User
     {
         $new = new self();
         $new->name = $data['name'] ?? null;
-        $new->email = ($data['email'] ?? null) ? new Email($data['email']) : null;
+        $new->email = $data['email'] ?? null;
         $new->imageUri = ($data['imageUrl'] ?? null) ? new Uri($data['imageUrl']) : null;
 
         return $new;
@@ -43,7 +37,7 @@ final class User
         return $this->name;
     }
 
-    public function email(): ?Email
+    public function email(): ?string
     {
         return $this->email;
     }

@@ -4,34 +4,38 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Messaging;
 
+use Beste\Json;
 use Kreait\Firebase\Exception\InvalidArgumentException;
 use Kreait\Firebase\Exception\Messaging\InvalidArgument;
 
+/**
+ * @see https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
+ *
+ * @phpstan-import-type AndroidConfigShape from AndroidConfig
+ * @phpstan-import-type ApnsConfigShape from ApnsConfig
+ * @phpstan-import-type FcmOptionsShape from FcmOptions
+ * @phpstan-import-type WebPushConfigShape from WebPushConfig
+ */
 final class CloudMessage implements Message
 {
-    /** @var MessageTarget|null */
-    private $target;
+    private MessageTarget $target;
+    private MessageData $data;
+    private Notification $notification;
+    private AndroidConfig $androidConfig;
+    private ApnsConfig $apnsConfig;
+    private WebPushConfig $webPushConfig;
+    private FcmOptions $fcmOptions;
 
-    /** @var MessageData|null */
-    private $data;
-
-    /** @var Notification|null */
-    private $notification;
-
-    /** @var AndroidConfig|null */
-    private $androidConfig;
-
-    /** @var ApnsConfig|null */
-    private $apnsConfig;
-
-    /** @var WebPushConfig|null */
-    private $webPushConfig;
-
-    /** @var FcmOptions|null */
-    private $fcmOptions;
-
-    private function __construct()
-    {
+    private function __construct(
+        MessageTarget $messageTarget
+    ) {
+        $this->target = $messageTarget;
+        $this->data = MessageData::fromArray([]);
+        $this->notification = Notification::fromArray([]);
+        $this->androidConfig = AndroidConfig::fromArray([]);
+        $this->apnsConfig = ApnsConfig::fromArray([]);
+        $this->webPushConfig = WebPushConfig::fromArray([]);
+        $this->fcmOptions = FcmOptions::fromArray([]);
     }
 
     /**
@@ -46,16 +50,28 @@ final class CloudMessage implements Message
 
     public static function new(): self
     {
-        return new self();
+        return new self(MessageTarget::with(MessageTarget::UNKNOWN, ''));
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array{
+     *     token?: non-empty-string,
+     *     topic?: non-empty-string,
+     *     condition?: non-empty-string,
+     *     data?: MessageData|array<string, string>,
+     *     notification?: Notification|array{
+     *         title?: string,
+     *         body?: string,
+     *         image?: string
+     *     },
+     *     android?: AndroidConfigShape,
+     *     apns?: ApnsConfig|ApnsConfigShape,
+     *     webpush?: WebPushConfig|WebPushConfigShape,
+     *     fcm_options?: FcmOptions|FcmOptionsShape
+     * } $data
      */
     public static function fromArray(array $data): self
     {
-        $new = new self();
-
         if (\count(\array_intersect(\array_keys($data), MessageTarget::TYPES)) > 1) {
             throw new InvalidArgument(
                 'A message can only have one of the following targets: '
@@ -63,36 +79,30 @@ final class CloudMessage implements Message
             );
         }
 
-        if ($targetValue = $data[MessageTarget::CONDITION] ?? null) {
-            $new = $new->withChangedTarget(MessageTarget::CONDITION, (string) $targetValue);
-        } elseif ($targetValue = $data[MessageTarget::TOKEN] ?? null) {
-            $new = $new->withChangedTarget(MessageTarget::TOKEN, (string) $targetValue);
-        } elseif ($targetValue = $data[MessageTarget::TOPIC] ?? null) {
-            $new = $new->withChangedTarget(MessageTarget::TOPIC, (string) $targetValue);
+        $new = new self(self::determineTargetFromArray($data));
+
+        if ($messageData = ($data['data'] ?? null)) {
+            $new = $new->withData($messageData);
         }
 
-        if ($data['data'] ?? null) {
-            $new = $new->withData($data['data']);
+        if ($notification = ($data['notification'] ?? null)) {
+            $new = $new->withNotification($notification);
         }
 
-        if ($data['notification'] ?? null) {
-            $new = $new->withNotification($data['notification']);
+        if ($androidConfig = ($data['android'] ?? null)) {
+            $new = $new->withAndroidConfig($androidConfig);
         }
 
-        if ($data['android'] ?? null) {
-            $new = $new->withAndroidConfig($data['android']);
+        if ($apnsConfig = ($data['apns'] ?? null)) {
+            $new = $new->withApnsConfig($apnsConfig);
         }
 
-        if ($data['apns'] ?? null) {
-            $new = $new->withApnsConfig(ApnsConfig::fromArray($data['apns']));
+        if ($webPushConfig = ($data['webpush'] ?? null)) {
+            $new = $new->withWebPushConfig($webPushConfig);
         }
 
-        if ($data['webpush'] ?? null) {
-            $new = $new->withWebPushConfig($data['webpush']);
-        }
-
-        if ($data['fcm_options'] ?? null) {
-            $new = $new->withFcmOptions($data['fcm_options']);
+        if ($fcmOptions = ($data['fcm_options'] ?? null)) {
+            $new = $new->withFcmOptions($fcmOptions);
         }
 
         return $new;
@@ -112,7 +122,7 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param MessageData|array<string, string> $data
+     * @param MessageData|array<array-key, mixed> $data
      *
      * @throws InvalidArgumentException
      */
@@ -125,7 +135,11 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param Notification|array<string, string> $notification
+     * @param Notification|array{
+     *     title?: string,
+     *     body?: string,
+     *     image?: string
+     * } $notification
      *
      * @throws InvalidArgumentException
      */
@@ -138,7 +152,7 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param AndroidConfig|array<string, mixed> $config
+     * @param AndroidConfig|AndroidConfigShape $config
      *
      * @throws InvalidArgumentException
      */
@@ -151,7 +165,7 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param ApnsConfig|array<string, mixed> $config
+     * @param ApnsConfig|ApnsConfigShape $config
      *
      * @throws InvalidArgumentException
      */
@@ -164,7 +178,7 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param WebPushConfig|array<string, mixed> $config
+     * @param WebPushConfig|WebPushConfigShape $config
      */
     public function withWebPushConfig($config): self
     {
@@ -175,7 +189,7 @@ final class CloudMessage implements Message
     }
 
     /**
-     * @param FcmOptions|array<string, mixed> $options
+     * @param FcmOptions|FcmOptionsShape $options
      */
     public function withFcmOptions($options): self
     {
@@ -186,20 +200,40 @@ final class CloudMessage implements Message
     }
 
     /**
-     * Enables default notifications sounds on iOS and Android devices.
+     * Enables default notifications sounds on iOS and Android devices. WebPush doesn't support sounds.
      */
     public function withDefaultSounds(): self
     {
         $new = clone $this;
-        $new->apnsConfig = ($new->apnsConfig ?: ApnsConfig::new())->withDefaultSound();
-        $new->androidConfig = ($new->androidConfig ?: AndroidConfig::new())->withDefaultSound();
+        $new->apnsConfig = $this->apnsConfig->withDefaultSound();
+        $new->androidConfig = $this->androidConfig->withDefaultSound();
+
+        return $new;
+    }
+
+    public function withLowestPossiblePriority(): self
+    {
+        $new = clone $this;
+        $new->apnsConfig = $this->apnsConfig->withPowerConservingPriority();
+        $new->androidConfig = $this->androidConfig->withNormalMessagePriority();
+        $new->webPushConfig = $this->webPushConfig->withVeryLowUrgency();
+
+        return $new;
+    }
+
+    public function withHighestPossiblePriority(): self
+    {
+        $new = clone $this;
+        $new->apnsConfig = $this->apnsConfig->withImmediatePriority();
+        $new->androidConfig = $this->androidConfig->withHighMessagePriority();
+        $new->webPushConfig = $this->webPushConfig->withHighUrgency();
 
         return $new;
     }
 
     public function hasTarget(): bool
     {
-        return (bool) $this->target;
+        return $this->target->type() !== MessageTarget::UNKNOWN;
     }
 
     /**
@@ -216,10 +250,40 @@ final class CloudMessage implements Message
             'fcm_options' => $this->fcmOptions,
         ];
 
-        if ($this->target) {
+        $data = Json::decode(Json::encode($data), true);
+
+        if ($this->target->type() !== MessageTarget::UNKNOWN) {
             $data[$this->target->type()] = $this->target->value();
         }
 
-        return \array_filter($data);
+        return \array_filter(
+            $data,
+            static fn ($value) => $value !== null && $value !== []
+        );
+    }
+
+
+    /**
+     * @param array{
+     *     token?: string,
+     *     topic?: string,
+     *     condition?: string
+     * } $data
+     */
+    private static function determineTargetFromArray(array $data): MessageTarget
+    {
+        if ($targetValue = $data[MessageTarget::CONDITION] ?? null) {
+            return MessageTarget::with(MessageTarget::CONDITION, $targetValue);
+        }
+
+        if ($targetValue = $data[MessageTarget::TOKEN] ?? null) {
+            return MessageTarget::with(MessageTarget::TOKEN, $targetValue);
+        }
+
+        if ($targetValue = $data[MessageTarget::TOPIC] ?? null) {
+            return MessageTarget::with(MessageTarget::TOPIC, $targetValue);
+        }
+
+        return MessageTarget::with(MessageTarget::UNKNOWN, '');
     }
 }

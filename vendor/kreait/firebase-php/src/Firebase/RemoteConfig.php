@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase;
 
+use Beste\Json;
 use Kreait\Firebase\Exception\RemoteConfig\VersionNotFound;
 use Kreait\Firebase\RemoteConfig\ApiClient;
 use Kreait\Firebase\RemoteConfig\FindVersions;
 use Kreait\Firebase\RemoteConfig\Template;
 use Kreait\Firebase\RemoteConfig\Version;
 use Kreait\Firebase\RemoteConfig\VersionNumber;
-use Kreait\Firebase\Util\JSON;
 use Psr\Http\Message\ResponseInterface;
 use Traversable;
 
-class RemoteConfig implements Contract\RemoteConfig
+/**
+ * @internal
+ */
+final class RemoteConfig implements Contract\RemoteConfig
 {
-    /** @var ApiClient */
-    private $client;
+    private ApiClient $client;
 
-    /**
-     * @internal
-     */
     public function __construct(ApiClient $client)
     {
         $this->client = $client;
@@ -41,7 +40,8 @@ class RemoteConfig implements Contract\RemoteConfig
     {
         $etag = $this->client
             ->publishTemplate($this->ensureTemplate($template))
-            ->getHeader('ETag');
+            ->getHeader('ETag')
+        ;
 
         return \array_shift($etag) ?: '';
     }
@@ -75,7 +75,7 @@ class RemoteConfig implements Contract\RemoteConfig
 
         do {
             $response = $this->client->listVersions($query, $pageToken);
-            $result = JSON::decode((string) $response->getBody(), true);
+            $result = Json::decode((string) $response->getBody(), true);
 
             foreach ((array) ($result['versions'] ?? []) as $versionData) {
                 ++$count;
@@ -111,7 +111,7 @@ class RemoteConfig implements Contract\RemoteConfig
         $etagHeader = $response->getHeader('ETag');
         $etag = \array_shift($etagHeader) ?: '*';
 
-        $data = JSON::decode((string) $response->getBody(), true);
+        $data = Json::decode((string) $response->getBody(), true);
 
         return Template::fromArray($data, $etag);
     }

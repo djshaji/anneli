@@ -8,14 +8,11 @@ use InvalidArgumentException;
 
 final class VerifyIdToken
 {
-    /** @var string */
-    private $token = '';
+    private string $token = '';
 
-    /** @var int */
-    private $leewayInSeconds = 0;
+    private int $leewayInSeconds = 0;
 
-    /** @var string|null */
-    private $expectedTenantId;
+    private ?string $expectedTenantId = null;
 
     private function __construct()
     {
@@ -54,10 +51,7 @@ final class VerifyIdToken
         return $this->token;
     }
 
-    /**
-     * @return string|null
-     */
-    public function expectedTenantId()
+    public function expectedTenantId(): ?string
     {
         return $this->expectedTenantId;
     }

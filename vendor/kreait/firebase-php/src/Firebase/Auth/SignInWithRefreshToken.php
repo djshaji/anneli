@@ -6,25 +6,20 @@ namespace Kreait\Firebase\Auth;
 
 final class SignInWithRefreshToken implements IsTenantAware, SignIn
 {
-    /** @var string */
-    private $refreshToken;
+    private string $refreshToken;
+    private ?string $tenantId = null;
 
-    /** @var TenantId|null */
-    private $tenantId;
-
-    private function __construct()
+    private function __construct(string $refreshToken)
     {
+        $this->refreshToken = $refreshToken;
     }
 
     public static function fromValue(string $refreshToken): self
     {
-        $instance = new self();
-        $instance->refreshToken = $refreshToken;
-
-        return $instance;
+        return new self($refreshToken);
     }
 
-    public function withTenantId(TenantId $tenantId): self
+    public function withTenantId(string $tenantId): self
     {
         $action = clone $this;
         $action->tenantId = $tenantId;
@@ -37,7 +32,7 @@ final class SignInWithRefreshToken implements IsTenantAware, SignIn
         return $this->refreshToken;
     }
 
-    public function tenantId(): ?TenantId
+    public function tenantId(): ?string
     {
         return $this->tenantId;
     }

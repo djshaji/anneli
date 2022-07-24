@@ -5,7 +5,12 @@ use Kreait\Firebase\Messaging\CloudMessage;
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 $_GET ["quiet"] = true ;
-chdir ("/var/www/". explode (".",$_SERVER ["HTTP_HOST"])[0]);
+// var_dump ($_SERVER);
+
+# the following did not parse correctly for subdomains (obviously)
+// chdir ("/var/www/". explode (".",$_SERVER ["HTTP_HOST"])[0]);
+# hence this
+chdir ("/var/www/".pathinfo ($_SERVER ['HTTP_HOST'], PATHINFO_FILENAME));
 include "config.php";
 include "anneli/db.php";
 include "anneli/token.php";

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Auth;
 
+use Beste\Json;
 use GuzzleHttp\ClientInterface;
+use Kreait\Firebase\Auth\SignIn\Handler as SignInHandler;
 use Kreait\Firebase\Exception\Auth\EmailNotFound;
 use Kreait\Firebase\Exception\Auth\ExpiredOobCode;
 use Kreait\Firebase\Exception\Auth\InvalidOobCode;
@@ -12,65 +14,80 @@ use Kreait\Firebase\Exception\Auth\OperationNotAllowed;
 use Kreait\Firebase\Exception\Auth\UserDisabled;
 use Kreait\Firebase\Exception\AuthApiExceptionConverter;
 use Kreait\Firebase\Exception\AuthException;
-use Kreait\Firebase\Exception\FirebaseException;
-use Kreait\Firebase\Http\WrappedGuzzleClient;
 use Kreait\Firebase\Request;
-use Kreait\Firebase\Value\Provider;
 use Psr\Http\Message\ResponseInterface;
+use StellaMaris\Clock\ClockInterface;
 use Throwable;
 
 /**
  * @internal
  */
-class ApiClient implements ClientInterface
+class ApiClient
 {
-    use WrappedGuzzleClient;
+    private string $projectId;
+    private ?string $tenantId;
+    /** @var ProjectAwareAuthResourceUrlBuilder|TenantAwareAuthResourceUrlBuilder */
+    private $awareAuthResourceUrlBuilder;
+    private AuthResourceUrlBuilder $authResourceUrlBuilder;
+    private ClientInterface $client;
+    private SignInHandler $signInHandler;
+    private ClockInterface $clock;
 
-    /** @var TenantId|null */
-    private $tenantId;
+    private AuthApiExceptionConverter $errorHandler;
 
-    /** @var AuthApiExceptionConverter */
-    private $errorHandler;
-
-    /**
-     * @internal
-     */
-    public function __construct(ClientInterface $client, ?TenantId $tenantId = null)
-    {
-        $this->client = $client;
+    public function __construct(
+        string $projectId,
+        ?string $tenantId,
+        ClientInterface $client,
+        SignInHandler $signInHandler,
+        ClockInterface $clock
+    ) {
+        $this->projectId = $projectId;
         $this->tenantId = $tenantId;
+        $this->client = $client;
+        $this->signInHandler = $signInHandler;
+        $this->clock = $clock;
         $this->errorHandler = new AuthApiExceptionConverter();
+
+        $this->awareAuthResourceUrlBuilder = $tenantId !== null
+            ? TenantAwareAuthResourceUrlBuilder::forProjectAndTenant($projectId, $tenantId)
+            : ProjectAwareAuthResourceUrlBuilder::forProject($projectId);
+
+        $this->authResourceUrlBuilder = AuthResourceUrlBuilder::create();
     }
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function createUser(Request\CreateUser $request): ResponseInterface
     {
-        return $this->requestApi('signupNewUser', $request->jsonSerialize());
+        $url = $this->authResourceUrlBuilder->getUrl('/accounts:signUp');
+
+        return $this->requestApi($url, $request->jsonSerialize());
     }
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function updateUser(Request\UpdateUser $request): ResponseInterface
     {
-        return $this->requestApi('setAccountInfo', $request->jsonSerialize());
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:update');
+
+        return $this->requestApi($url, $request->jsonSerialize());
     }
 
     /**
      * @param array<string, mixed> $claims
      *
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function setCustomUserClaims(string $uid, array $claims): ResponseInterface
     {
-        return $this->requestApi('https://identitytoolkit.googleapis.com/v1/accounts:update', [
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:update');
+
+        return $this->requestApi($url, [
             'localId' => $uid,
-            'customAttributes' => \json_encode((object) $claims),
+            'customAttributes' => JSON::encode((object) $claims),
         ]);
     }
 
@@ -79,56 +96,72 @@ class ApiClient implements ClientInterface
      *
      * @throws EmailNotFound
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function getUserByEmail(string $email): ResponseInterface
     {
-        return $this->requestApi('getAccountInfo', [
-            'email' => [$email],
-        ]);
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:lookup');
+
+        return $this->requestApi($url, ['email' => [$email]]);
     }
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function getUserByPhoneNumber(string $phoneNumber): ResponseInterface
     {
-        return $this->requestApi('getAccountInfo', [
-            'phoneNumber' => [$phoneNumber],
-        ]);
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:lookup');
+
+        return $this->requestApi($url, ['phoneNumber' => [$phoneNumber]]);
     }
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function downloadAccount(?int $batchSize = null, ?string $nextPageToken = null): ResponseInterface
     {
-        $batchSize = $batchSize ?? 1000;
+        $batchSize = $batchSize ?: 1000;
 
-        return $this->requestApi('downloadAccount', \array_filter([
-            'maxResults' => $batchSize,
-            'nextPageToken' => $nextPageToken,
-        ]));
+        $urlParams = \array_filter([
+            'maxResults' => (string) $batchSize,
+            'nextPageToken' => (string) $nextPageToken,
+        ]);
+
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:batchGet', $urlParams);
+
+        return $this->requestApi($url);
     }
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function deleteUser(string $uid): ResponseInterface
     {
-        return $this->requestApi('deleteAccount', [
-            'localId' => $uid,
-        ]);
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:delete');
+
+        return $this->requestApi($url, ['localId' => $uid]);
+    }
+
+    /**
+     * @param string[] $uids
+     *
+     * @throws AuthException
+     */
+    public function deleteUsers(array $uids, bool $forceDeleteEnabledUsers): ResponseInterface
+    {
+        $data = [
+            'localIds' => $uids,
+            'force' => $forceDeleteEnabledUsers,
+        ];
+
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:batchDelete');
+
+        return $this->requestApi($url, $data);
     }
 
     /**
      * @param string|array<string> $uids
      *
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function getAccountInfo($uids): ResponseInterface
     {
@@ -136,9 +169,9 @@ class ApiClient implements ClientInterface
             $uids = [$uids];
         }
 
-        return $this->requestApi('getAccountInfo', [
-            'localId' => $uids,
-        ]);
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:lookup');
+
+        return $this->requestApi($url, ['localId' => $uids]);
     }
 
     /**
@@ -146,13 +179,12 @@ class ApiClient implements ClientInterface
      * @throws InvalidOobCode
      * @throws OperationNotAllowed
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function verifyPasswordResetCode(string $oobCode): ResponseInterface
     {
-        return $this->requestApi('resetPassword', [
-            'oobCode' => $oobCode,
-        ]);
+        $url = $this->authResourceUrlBuilder->getUrl('/accounts:resetPassword');
+
+        return $this->requestApi($url, ['oobCode' => $oobCode]);
     }
 
     /**
@@ -161,11 +193,12 @@ class ApiClient implements ClientInterface
      * @throws OperationNotAllowed
      * @throws UserDisabled
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function confirmPasswordReset(string $oobCode, string $newPassword): ResponseInterface
     {
-        return $this->requestApi('resetPassword', [
+        $url = $this->authResourceUrlBuilder->getUrl('/accounts:resetPassword');
+
+        return $this->requestApi($url, [
             'oobCode' => $oobCode,
             'newPassword' => $newPassword,
         ]);
@@ -173,50 +206,102 @@ class ApiClient implements ClientInterface
 
     /**
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function revokeRefreshTokens(string $uid): ResponseInterface
     {
-        return $this->requestApi('setAccountInfo', [
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:update');
+
+        return $this->requestApi($url, [
             'localId' => $uid,
-            'validSince' => \time(),
+            'validSince' => (string) \time(),
         ]);
     }
 
     /**
-     * @param array<int, string|Provider> $providers
+     * @param array<int, \Stringable|string> $providers
      *
      * @throws AuthException
-     * @throws FirebaseException
      */
     public function unlinkProvider(string $uid, array $providers): ResponseInterface
     {
-        return $this->requestApi('setAccountInfo', [
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:update');
+        $providers = \array_map('strval', $providers);
+
+        return $this->requestApi($url, [
             'localId' => $uid,
             'deleteProvider' => $providers,
         ]);
     }
 
     /**
+     * @param int|\DateInterval $ttl
+     */
+    public function createSessionCookie(string $idToken, $ttl): string
+    {
+        return (new CreateSessionCookie\GuzzleApiClientHandler($this->client, $this->projectId))
+            ->handle(CreateSessionCookie::forIdToken($idToken, $this->tenantId, $ttl, $this->clock))
+        ;
+    }
+
+    public function getEmailActionLink(string $type, string $email, ActionCodeSettings $actionCodeSettings, ?string $locale = null): string
+    {
+        return (new CreateActionLink\GuzzleApiClientHandler($this->client, $this->projectId))
+            ->handle(CreateActionLink::new($type, $email, $actionCodeSettings, $this->tenantId, $locale))
+            ;
+    }
+
+    /**
+     * TODO: Make that this method can be emulated.
+     */
+    public function sendEmailActionLink(string $type, string $email, ActionCodeSettings $actionCodeSettings, ?string $locale = null, ?string $idToken = null): void
+    {
+        $createAction = CreateActionLink::new($type, $email, $actionCodeSettings, $this->tenantId, $locale);
+        $sendAction = new SendActionLink($createAction, $locale);
+
+        if ($idToken !== null) {
+            $sendAction = $sendAction->withIdTokenString($idToken);
+        }
+
+        (new SendActionLink\GuzzleApiClientHandler($this->client, $this->projectId))->handle($sendAction);
+    }
+
+    /**
+     * TODO: Make that this method can be emulated.
+     */
+    public function handleSignIn(SignIn $action): SignInResult
+    {
+        if ($this->tenantId !== null) {
+            $action = $action->withTenantId($this->tenantId);
+        }
+
+        return $this->signInHandler->handle($action);
+    }
+
+    /**
      * @param array<mixed> $data
      *
      * @throws AuthException
-     * @throws FirebaseException
      */
-    private function requestApi(string $uri, array $data): ResponseInterface
+    private function requestApi(string $uri, ?array $data = null): ResponseInterface
     {
         $options = [];
+        $method = 'GET';
 
-        if ($this->tenantId) {
-            $data['tenantId'] = $this->tenantId->toString();
+        if (!\str_contains($uri, 'projects')) {
+            $data['targetProjectId'] = $this->projectId;
+        }
+
+        if ($this->tenantId !== null && !\str_contains($uri, 'tenants')) {
+            $data['tenantId'] = $this->tenantId;
         }
 
         if (!empty($data)) {
+            $method = 'POST';
             $options['json'] = $data;
         }
 
         try {
-            return $this->request('POST', $uri, $options);
+            return $this->client->request($method, $uri, $options);
         } catch (Throwable $e) {
             throw $this->errorHandler->convertException($e);
         }

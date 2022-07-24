@@ -6,16 +6,18 @@ namespace Kreait\Firebase\Messaging;
 
 use Kreait\Firebase\Exception\InvalidArgumentException;
 
+/**
+ * @phpstan-type NotificationShape array{
+ *     title?: string,
+ *     body?: string,
+ *     imageUrl?: string
+ * }
+ */
 final class Notification implements \JsonSerializable
 {
-    /** @var string|null */
-    private $title;
-
-    /** @var string|null */
-    private $body;
-
-    /** @var string|null */
-    private $imageUrl;
+    private ?string $title;
+    private ?string $body;
+    private ?string $imageUrl;
 
     /**
      * @throws InvalidArgumentException if both title and body are null
@@ -25,10 +27,6 @@ final class Notification implements \JsonSerializable
         $this->title = $title;
         $this->body = $body;
         $this->imageUrl = $imageUrl;
-
-        if ($this->title === null && $this->body === null) {
-            throw new InvalidArgumentException('The title and body of a notification cannot both be NULL');
-        }
     }
 
     /**
@@ -40,7 +38,11 @@ final class Notification implements \JsonSerializable
     }
 
     /**
-     * @param array<string, string> $data
+     * @param array{
+     *     title?: string,
+     *     body?: string,
+     *     image?: string
+     * } $data
      *
      * @throws InvalidArgumentException if both title and body are null
      */
@@ -101,8 +103,6 @@ final class Notification implements \JsonSerializable
             'title' => $this->title,
             'body' => $this->body,
             'image' => $this->imageUrl,
-        ], static function ($value) {
-            return $value !== null;
-        });
+        ], static fn ($value) => $value !== null);
     }
 }

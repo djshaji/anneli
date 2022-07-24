@@ -6,25 +6,21 @@ namespace Kreait\Firebase\Auth;
 
 final class SignInWithCustomToken implements IsTenantAware, SignIn
 {
-    /** @var string */
-    private $customToken;
+    private string $customToken;
 
-    /** @var TenantId|null */
-    private $tenantId;
+    private ?string $tenantId = null;
 
-    private function __construct()
+    private function __construct(string $customToken)
     {
+        $this->customToken = $customToken;
     }
 
     public static function fromValue(string $customToken): self
     {
-        $instance = new self();
-        $instance->customToken = $customToken;
-
-        return $instance;
+        return new self($customToken);
     }
 
-    public function withTenantId(TenantId $tenantId): self
+    public function withTenantId(string $tenantId): self
     {
         $action = clone $this;
         $action->tenantId = $tenantId;
@@ -37,7 +33,7 @@ final class SignInWithCustomToken implements IsTenantAware, SignIn
         return $this->customToken;
     }
 
-    public function tenantId(): ?TenantId
+    public function tenantId(): ?string
     {
         return $this->tenantId;
     }

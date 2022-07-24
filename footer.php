@@ -1,9 +1,12 @@
-<?php if ($config ["footer"] && !isset ($_GET ['quiet']) && ! isset ($_GET[ 'print'])) { ?>
+<?php if ($config ["footer"] && !isset ($_GET ['quiet']) && ! isset ($_GET[ 'print'])) { 
+  if ($config ["footer-phone"] == null) 
+    $config ["footer-phone"] = "917006351732" ;  
+?>
 <div class="d-print-none" style="opacity: 80%; height: 40px;transition: all 0.4s; position: fixed;bottom:15px;left:15px;z-index: 9999;">
-  <a href="https://wa.me/917006351732" type="button" class="btn btn-sm btn-success bmd-btn-fab">
+  <a href="https://wa.me/<?php echo $config ["footer-phone"] ;?>" type="button" class="btn btn-sm btn-success bmd-btn-fab">
     <i class="fab fa-whatsapp" style="font-size: 20;" aria-hidden="true"></i>
   </a>
-  <a href="tel://+917006351732" type="button" class="btn btn-sm btn-danger bmd-btn-fab">
+  <a href="tel://+<?php echo $config ["footer-phone"] ;?>" type="button" class="btn btn-sm btn-danger bmd-btn-fab">
       <i class="fa fa-phone"  style="font-size: 20;" id='fab-phone'></i>
   </a>      
   <!-- <label class="badge badge-info p-2">Contact me</label> -->
@@ -11,10 +14,17 @@
 
 <div id="footer" class="<?php echo $config ['footer-bg'];?> p-4 text-center">
   <div class="copyright">
+    <?php if ($config ["footer-msg"]) {
+      echo $config ["footer-msg"] ;
+    } else { ?>
     Made with &nbsp;<img width="40px" src="<?php echo $config ["logo"] ;?>"> and Coffee.
+    <?php if ($config ["privacy-policy"]) printf ("<div class='row justify-content-center'><a class='col-2 text-white nav-link' href='%s'><i class=\"text-white fas fa-lock me-2\"></i>Privacy Policy</a></div>", $config ["privacy-policy"]);?>
+    <?php } ?>
   </div>
 
 </div>
+<!-- footer should end here -->
+<?php } ?>
 
 <!-- mdl layout -->
 <?php if ($config ['header'] != false) echo '</div>' ;?>
@@ -46,7 +56,6 @@
   </div>
 </div>
 </body></html>
-<?php } ?>
 <?php 
   colors_dialog () ; 
   include "spinner.php";

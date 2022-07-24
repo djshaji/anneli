@@ -19,6 +19,8 @@ use Kreait\Firebase\Messaging\Topic;
 
 interface Messaging
 {
+    public const BATCH_MESSAGE_LIMIT = 500;
+
     /**
      * @param Message|array<string, mixed> $message
      *
@@ -41,7 +43,7 @@ interface Messaging
     public function sendMulticast($message, $registrationTokens, bool $validateOnly = false): MulticastSendReport;
 
     /**
-     * @param array[]|Message[]|Messages $messages
+     * @param Message[]|Messages $messages
      *
      * @throws InvalidArgumentException if the message is invalid
      * @throws MessagingException if the API request failed
@@ -73,7 +75,7 @@ interface Messaging
 
     /**
      * @param string|Topic $topic
-     * @param mixed $registrationTokenOrTokens
+     * @param RegistrationTokens|RegistrationToken|RegistrationToken[]|string[]|string $registrationTokenOrTokens
      *
      * @return array<string, array<string, string>>
      */
@@ -89,7 +91,7 @@ interface Messaging
 
     /**
      * @param string|Topic $topic
-     * @param mixed $registrationTokenOrTokens
+     * @param RegistrationTokens|RegistrationToken|RegistrationToken[]|string[]|string $registrationTokenOrTokens
      *
      * @return array<string, array<string, string>>
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase;
 
+use Beste\Json;
 use GuzzleHttp\Promise\Utils;
 use Kreait\Firebase\Exception\InvalidArgumentException;
 use Kreait\Firebase\Exception\Messaging\InvalidArgument;
@@ -19,37 +20,39 @@ use Kreait\Firebase\Messaging\Http\Request\SendMessages;
 use Kreait\Firebase\Messaging\Http\Request\SendMessageToTokens;
 use Kreait\Firebase\Messaging\Message;
 use Kreait\Firebase\Messaging\Messages;
+use Kreait\Firebase\Messaging\MessageTarget;
 use Kreait\Firebase\Messaging\MulticastSendReport;
+use Kreait\Firebase\Messaging\Processor\SetApnsContentAvailableIfNeeded;
+use Kreait\Firebase\Messaging\Processor\SetApnsPushTypeIfNeeded;
 use Kreait\Firebase\Messaging\RegistrationToken;
 use Kreait\Firebase\Messaging\RegistrationTokens;
 use Kreait\Firebase\Messaging\Topic;
-use Kreait\Firebase\Project\ProjectId;
-use Kreait\Firebase\Util\JSON;
 
-class Messaging implements Contract\Messaging
+/**
+ * @internal
+ */
+final class Messaging implements Contract\Messaging
 {
-    /** @var string */
-    private $projectId;
+    private string $projectId;
 
-    /** @var ApiClient */
-    private $messagingApi;
+    private ApiClient $messagingApi;
 
-    /** @var AppInstanceApiClient */
-    private $appInstanceApi;
+    private AppInstanceApiClient $appInstanceApi;
 
-    /**
-     * @internal
-     */
-    public function __construct(ProjectId $projectId, ApiClient $messagingApiClient, AppInstanceApiClient $appInstanceApiClient)
+    public function __construct(string $projectId, ApiClient $messagingApiClient, AppInstanceApiClient $appInstanceApiClient)
     {
         $this->messagingApi = $messagingApiClient;
         $this->appInstanceApi = $appInstanceApiClient;
-        $this->projectId = $projectId->value();
+        $this->projectId = $projectId;
     }
 
     public function send($message, bool $validateOnly = false): array
     {
         $message = $this->makeMessage($message);
+
+        if (!$this->messageHasTarget($message)) {
+            throw new InvalidArgument('The given message is missing a target');
+        }
 
         $request = new SendMessage($this->projectId, $message, $validateOnly);
 
@@ -64,7 +67,7 @@ class Messaging implements Contract\Messaging
             throw $e;
         }
 
-        return JSON::decode((string) $response->getBody(), true);
+        return Json::decode((string) $response->getBody(), true);
     }
 
     public function sendMulticast($message, $registrationTokens, bool $validateOnly = false): MulticastSendReport
@@ -137,9 +140,10 @@ class Messaging implements Contract\Messaging
 
     public function unsubscribeFromTopics(array $topics, $registrationTokenOrTokens): array
     {
-        $topics = \array_map(static function ($topic) {
-            return $topic instanceof Topic ? $topic : Topic::fromValue($topic);
-        }, $topics);
+        $topics = \array_map(
+            static fn ($topic) => $topic instanceof Topic ? $topic : Topic::fromValue($topic),
+            $topics
+        );
 
         $tokens = $this->ensureNonEmptyRegistrationTokens($registrationTokenOrTokens);
 
@@ -153,7 +157,8 @@ class Messaging implements Contract\Messaging
         $promises = [];
 
         foreach ($tokens as $token) {
-            $promises[$token->value()] = $this->appInstanceApi->getAppInstanceAsync($token)
+            $promises[$token->value()] = $this->appInstanceApi
+                ->getAppInstanceAsync($token)
                 ->then(function (AppInstance $appInstance) use ($token) {
                     $topics = [];
                     foreach ($appInstance->topicSubscriptions() as $subscription) {
@@ -162,9 +167,8 @@ class Messaging implements Contract\Messaging
 
                     return \array_keys($this->unsubscribeFromTopics($topics, $token));
                 })
-                ->otherwise(static function (\Throwable $e) {
-                    return $e->getMessage();
-                });
+                ->otherwise(static fn (\Throwable $e) => $e->getMessage())
+            ;
         }
 
         $responses = Utils::settle($promises)->wait();
@@ -201,11 +205,21 @@ class Messaging implements Contract\Messaging
      */
     private function makeMessage($message): Message
     {
-        if ($message instanceof Message) {
-            return $message;
-        }
+        $message = $message instanceof Message ? $message : CloudMessage::fromArray($message);
 
-        return CloudMessage::fromArray($message);
+        $message = (new SetApnsPushTypeIfNeeded())($message);
+        $message = (new SetApnsContentAvailableIfNeeded())($message);
+
+        return $message;
+    }
+
+    private function messageHasTarget(Message $message): bool
+    {
+        $check = Json::decode(Json::encode($message), true);
+
+        return \array_key_exists(MessageTarget::CONDITION, $check)
+            || \array_key_exists(MessageTarget::TOKEN, $check)
+            || \array_key_exists(MessageTarget::TOPIC, $check);
     }
 
     /**

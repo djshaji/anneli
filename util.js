@@ -329,11 +329,21 @@ function preview_theme () {
   theme = document.getElementById ("color-schemes").value
   font = document.getElementById ("fonts").value
   skin = document.getElementById ("skin").value
+  icon = document.getElementById ("icons").value
   el = uic ("link")
   el.setAttribute ("href", '/anneli/themer2.php?theme=' + theme + '&font=' + font + '&skin=' + skin)
   el.setAttribute ("type", "text/css")
   el.setAttribute ("rel", "stylesheet")
   document.body.appendChild (el)
+
+  for ( i of document.getElementsByTagName ("img")) {
+    if (i.src.startsWith (location.href + "anneli/assets/css/icons")) {
+      old_theme = i.src.split ("/")[7]
+      i.src = i.src.replace (old_theme, icon)
+    } else {
+      console.log ("not an icon: " + i.src)
+    }
+  }
 }
 
 function set_theme () {

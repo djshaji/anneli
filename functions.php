@@ -39,7 +39,7 @@ function colors_dialog () {
             <!-- <div class="spinner-border text-primary" role="status">
               <span class="sr-only">Loading...</span>
             </div> -->
-            <div class="col-md-4">
+            <div class="col-md-3">
               <b class="lead text-dark">Select Skin</b><br>
               <select onchange="preview_theme ()" class="form-select" id="skin">
                 <option value="">Default</option>
@@ -53,16 +53,30 @@ function colors_dialog () {
                 ?>
               </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <b class="lead text-dark">Select Theme</b><br>
               <select onchange="preview_theme ()" class="form-select" id="color-schemes">
                 <option value="">Default</option>
               </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <b class="lead text-dark">Select Font</b><br>
               <select onchange="preview_theme ()" class="form-select" id="fonts">
                 <option value="">Default</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <b class="lead text-dark">Select Icon Theme</b><br>
+              <select onchange="preview_theme ()" class="form-select" id="icons">
+                <option value="">Default</option>
+                <?php
+                  $skins = scandir ("anneli/assets/css/icons") ;
+                  foreach ($skins as $s) {
+                    if ($s =='.' || $s =='..')
+                      continue ;
+                    echo "<option value='$s'>".ucwords ($s)."</option>";
+                  }
+                ?>
               </select>
             </div>
           </div>

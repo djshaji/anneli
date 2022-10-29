@@ -1,5 +1,5 @@
 <?php
-if ($config ["analytics"] == false) {
+if ($quiet != true && $config ["analytics"] == false ) {
   echo "<script>const analyticsEnabled = false;</script>";
 }
 
@@ -41,7 +41,7 @@ $categories = [
   "Non Fiction"
 ];
 if (!isset ($_GET ['quiet']))
-  echo "<script>theme = '$theme' ; font = '$font'; skin = '$skin';</script>";
+  echo "<script>theme = '$theme' ; font = '$font'; skin = '$skin';icon_theme = 'Pop';</script>";
 else
   $quiet = true ;
 if ($_SESSION == null) {
@@ -145,6 +145,7 @@ if (!isset ($_GET ['quiet'])) {
   <script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
 <?php } ?>
 <script src="anneli/util.js?<?php echo time () ;?>"></script>
+<script src="anneli/mime.js"></script>
 <script src="anneli/colors.js?"></script>
 <script src="anneli/fonts.js?"></script>
 <!DOCTYPE html>

@@ -9,6 +9,9 @@
   <a href="tel://+<?php echo $config ["footer-phone"] ;?>" type="button" class="btn btn-sm btn-danger bmd-btn-fab">
       <i class="fa fa-phone"  style="font-size: 20;" id='fab-phone'></i>
   </a>      
+  <?php if ($config ["footer-floating"]) {
+    echo $config ["footer-floating"] ;
+    }?>
   <!-- <label class="badge badge-info p-2">Contact me</label> -->
 </div>
 
@@ -25,6 +28,8 @@
 </div>
 <!-- footer should end here -->
 <?php } ?>
+
+<?php if ($quiet != true) {?>
 
 <!-- mdl layout -->
 <?php if ($config ['header'] != false) echo '</div>' ;?>
@@ -55,12 +60,13 @@
     </div>
   </div>
 </div>
+
 </body></html>
 <?php 
   colors_dialog () ; 
   include "spinner.php";
-  
 ?>
 <script>
 init ()
 </script>
+<?php }?>

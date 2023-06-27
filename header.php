@@ -111,10 +111,11 @@ if (!isset ($_GET ['quiet'])) {
 <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script> -->
 
 <!-- for bootstrap 5 -->
+<?php if ($_GET ["print"] == null) { ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-<?php if (file_exists (getcwd () . "/favicon.png")) {?>
+<?php } if (file_exists (getcwd () . "/favicon.png")) {?>
 <link rel="shortcut icon" type="image/jpg" href="/favicon.png"/>
 <?php } else { ?>
 <link rel="shortcut icon" type="image/jpg" href="anneli/assets/img/favicon.png"/>

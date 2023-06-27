@@ -163,7 +163,7 @@ function require_login ($redirect = false) {
   } else if ($uid == null) {
     ?>
     <script>
-    uiConfig = uiConfigFaculty ; // this is brilliant
+    // uiConfig = uiConfigFaculty ; // this is brilliant
     </script>
     <div class="wrapper m-4">
       <div class="page-header clear-filter" filter-color="orange">

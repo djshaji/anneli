@@ -140,7 +140,7 @@ if (!isset ($_GET ['quiet'])) {
 <?php if (file_exists ($config ["dir"] . "/" . "firebaseConfig.js")) { ?>
   <script src="/firebaseConfig.js?<?php echo time () ;?>"></script>
 <?php } else { ?>
-  ?><?php echo "<script>fconfig = '".$config ["dir"] . "/" . "firebaseConfig.js'</script>";?>
+  <?php echo "<script>fconfig = '".$config ["dir"] . "/" . "firebaseConfig.js'</script>";?>
   <script>console.warn ("using default firebase config js | not found:", fconfig)</script>
   <script src="anneli/firebaseConfig.js?<?php echo time () ;?>"></script>
 <?php } ?>

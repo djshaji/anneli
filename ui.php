@@ -148,14 +148,14 @@ function fab ($id, $links) {
       ', $id
     );
 
+    echo '        <ul class="fade shadow m-2 dropdown-menu dropdown-menu-end">' ;
     foreach ($links as $label => $link) {
       printf ('
-        <ul class="fade shadow m-2 dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" type="button" href="%s">%s</a></li>
-        </ul>
-      </div>
       ', $link, $label) ;
     }
+
+    echo "         </ul>     </div>";
 }
 
 function ui_cards ($data, $title, $text, $image) {

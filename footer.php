@@ -20,7 +20,7 @@
     <?php if ($config ["footer-msg"]) {
       echo $config ["footer-msg"] ;
     } else { ?>
-    Made with &nbsp;<img width="40px" src="<?php echo $config ["logo"] ;?>"> and Coffee.
+    &copy; Copyright &nbsp;<img width="40px" src="<?php echo $config ["logo"] ;?>">
     <?php if ($config ["privacy-policy"]) printf ("<div class='row justify-content-center'><a class='col-2 text-white nav-link' href='%s'><i class=\"text-white fas fa-lock me-2\"></i>Privacy Policy</a></div>", $config ["privacy-policy"]);?>
     <?php } ?>
   </div>

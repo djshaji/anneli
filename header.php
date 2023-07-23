@@ -111,7 +111,7 @@ if (!isset ($_GET ['quiet'])) {
 <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script> -->
 
 <!-- for bootstrap 5 -->
-<?php if ($_GET ["print"] == null) { ?>
+<?php if (!isset ($_GET ["printa"])) { ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
@@ -156,6 +156,8 @@ if (!isset ($_GET ['quiet'])) {
   <link rel="apple-touch-icon" sizes="76x76" href="./anneli/assets/img/apple-icon.png">
   <!-- <link rel="icon" type="image/png" href="./anneli/assets/img/favicon.png"> -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta property="og:image" content="https://<?= $_SERVER ["SERVER_NAME"] . $config ["logo"]?>">
+
   <title>
     <?php echo $codename ;?>
 
@@ -171,7 +173,7 @@ if (!isset ($_GET ['quiet'])) {
 <body class="index-page sidebar-collapse">
   <!-- Navbar -->
   <div class="mdl-layout mdl-js-layout">
-  
+  <?php if (!isset ($_GET ["print"])) { ?>
   <div id="header-navbar" class="navbar navbar-expand-lg navbar-dark bg-<?php echo $config ['header-bg'] .' ' ; if ($config ['header'] == false) echo 'd-none' ;?>">
     <div class="container">
       <div class="d-md-none ms-3"></div>
@@ -259,6 +261,8 @@ if (!isset ($_GET ['quiet'])) {
       ?>
     </nav>
   </div>
+  <?php } ?>
+
 
 <?php 
 } 
@@ -267,3 +271,8 @@ if (! $quiet) {
 
 
 <?php } ?>
+<style>
+.mdl-layout__drawer-button {
+  color: white;
+}
+</style>

@@ -169,14 +169,14 @@ function require_login ($redirect = false) {
       <div class="page-header clear-filter" filter-color="orange">
         <div class="page-header-image" data-parallax="true" >
         </div>
-        <div class="container row d-flex">
-          <div class=" brand col-md-5">
+        <div class="row">
+          <div class=" brand d-none col-md-5">
             <!-- <img class="n-logo mt-6" src="./assets/img/now-logo.png" alt=""> -->
             <!-- <img width="150" src="./assets/img/epustakalaya.png" alt=""> -->
             <h1 class="h1-seo"><?php echo $codename ;?></h1>
             <h3><?php //echo $description ;?></h3>
           </div>
-          <div class="brand col-md-6 text-center">
+          <div class="brand border shadow p-3 col-md-12 text-center">
             <!-- Designed and -->
             <!-- <a href="http://invisionapp.com/" target="_blank">
               <img src="./assets/img/invision-white-slim.png" class="invision-logo" /> -->
@@ -185,14 +185,19 @@ function require_login ($redirect = false) {
             <strong><span><img width="40px" class="invision-logo" src="assets/img/logo.png"> GDC Udhampur</span></strong> -->
             <h5><i class="fa fa-shield-alt"></i>&nbsp;
               Login to the portal</h5>
-            <div  id="firebaseui-auth-container"></div>
+            <div  id="firebaseui-auth-container">
+            </div>
+            <button onclick="location.reload ()" class="btn m-2">
+              <i class="fas fa-sync"></i>
+              Refresh page
+            </button>            
           </div>
         </div>
         
       </div>
     </div>
   <?php
-  include 'footer.php';
+  include __DIR__ .'/footer.php';
     die () ;
   }    
 }
@@ -335,6 +340,23 @@ function get_file ($path) {
   header("X-Sendfile: $path");
   header("Content-type: application/octet-stream");
   header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+}
+
+function is_cli () {
+  return php_sapi_name()==="cli" ;
+}
+
+function check_cli () {
+  if (! is_cli ()) {
+    echo system ("fortune"); print ("<br><br>");
+    die ("This script cannot be run from the server.") ;
+  }
+}
+
+function require_root () {
+  if ($uid != $root_user) {
+    die ("403 Unauthorized") ;
+  }
 }
 
 ?>

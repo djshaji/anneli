@@ -190,7 +190,9 @@ function require_login ($redirect = false) {
             <button onclick="location.reload ()" class="btn m-2">
               <i class="fas fa-sync"></i>
               Refresh page
-            </button>            
+              <span id="login-spinner2" class="ms-2 spinner-border text-primary spinner-border-sm" role="status" aria-hidden="true"></span>
+            </button>           
+
           </div>
         </div>
         
@@ -359,4 +361,24 @@ function require_root () {
   }
 }
 
+function parse_csv ($string, $index = 0) {
+  $text = explode ("\n", $string) ;
+  $header = null ;
+
+  $data = array () ;
+  foreach ($text as $line) {
+    if ($header == null)
+      $header = explode (",", $line) ;
+    
+    $vector = explode (",", $line);
+    for ($i = 0 ; $i < sizeof ($vector) ; $i ++) {
+      if (! isset ($data [$vector [$index]]))
+        $data [$vector [$index]] = array () ;
+      
+      $data [$vector [$index]][$header [$i]] = $vector [$i] ;
+    }
+  }
+
+  return $data ;
+}
 ?>

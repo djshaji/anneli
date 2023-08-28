@@ -207,8 +207,11 @@ function init () {
         console.log (idTokenResult)
         token = idTokenResult
         // document.getElementById ("token").value = token.token;
+        reloadFlag = document.cookie.search (token.token)
         setCookie ("token", token.token, 10, 'auth')
         setCookie ("email", fireuser.email, 10, 'auth')
+        if (reloadFlag == -1)
+          location.reload ()
         // document.cookie ['token'] = token.token
         // document.cookie ['uid'] = user.uid
       })
@@ -233,6 +236,7 @@ function init () {
     }
 
     document.getElementById ("login-spinner").remove ()
+    document.getElementById ("login-spinner2").remove ()
   });
   
 }

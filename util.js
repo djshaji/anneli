@@ -236,7 +236,9 @@ function init () {
     }
 
     document.getElementById ("login-spinner").remove ()
-    document.getElementById ("login-spinner2").remove ()
+    l2 = document.getElementById ("login-spinner2")
+    if (l2)
+      l2.remove ()
   });
   
 }

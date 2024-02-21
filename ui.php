@@ -141,7 +141,7 @@ function ui_table_dialog ($cols, $title, $database, $fab = false, $json = "json"
 
 function fab ($id, $links) {
   printf ('
-    <div class="btn-group dropup position-absolute bottom-0 end-0">
+    <div class="btn-group dropup position-fixed bottom-0 end-0">
       <button id="%s" data-bs-toggle="dropdown" class="m-4 dropdown-toggle text-white shadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect bg-primary">
         <i class="material-icons">add</i>
       </button>

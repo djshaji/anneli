@@ -90,7 +90,7 @@ if (!isset ($_GET ['quiet'])) {
 
 <!-- To Do: Upgrade to Firebase 9 -->
 <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
-<!-- <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script> -->
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-analytics-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging-compat.js"></script>
